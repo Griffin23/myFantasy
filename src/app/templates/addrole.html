@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<body>
+<p style="font-weight:bold;">{{ post[0].team }}</p>
+<br>
+{% for p in post %}
+<div>
+	<p style="font-weight:bold;">{{ p.name + " 场上位置：" + p.role}}</p>
+	<a href="{{ url_for('role2db', name = p.name, role = 'PG') }}">PG</a>
+	<a href="{{ url_for('role2db', name = p.name, role = 'PG/SG') }}">PG/SG</a>
+	<a href="{{ url_for('role2db', name = p.name, role = 'SG') }}">SG</a>
+	<a href="{{ url_for('role2db', name = p.name, role = 'SG/SF') }}">SG/SF</a>
+	<a href="{{ url_for('role2db', name = p.name, role = 'SF') }}">SF</a>
+	<a href="{{ url_for('role2db', name = p.name, role = 'SF/PF') }}">SF/PF</a>
+	<a href="{{ url_for('role2db', name = p.name, role = 'PF') }}">PF</a>
+	<a href="{{ url_for('role2db', name = p.name, role = 'PF/C') }}">PF/C</a>
+	<a href="{{ url_for('role2db', name = p.name, role = 'C') }}">C</a>
+</div>
+{% endfor %}
+<br>
+<a href="{{ url_for('addrole') }}">返回</a>
+</body>
+{% endblock %}

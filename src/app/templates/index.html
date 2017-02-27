@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% block content %}
+<script src="../static/js/jquery-3.1.1.js"></script>
+<script type="text/javascript">
+	function currentTime(){
+		var d = new Date();
+		time = "";
+		time += d.getFullYear() + "-";
+		time += d.getMonth() + 1 + "-";
+		time += d.getDate();
+		return time
+	}
+</script>
+<script type="text/javascript">
+$(function(){
+	$("#time").text(currentTime()).css("margin-right", "1px");
+	$("td").css("width", "10%");
+	$("table").css("width", "67%").css("margin", "0px auto").css("font-size", "12px");
+	$("footer").css("background", "linear-gradient(#0bc, #fff)");
+	$("nav").css("background", "linear-gradient(#6cc, #ccc)");
+})
+</script>
+<body>
+	<nav class="navbar navbar-default">
+	  <div class="container-fluid">
+	    <!-- Brand and toggle get grouped for better mobile display -->
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	    </div>
+	
+	    <!-- Collect the nav links, forms, and other content for toggling -->
+	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="width:70%;margin:0px auto;">
+	      <ul class="nav navbar-nav">
+	      	{% if flag == "point_rank" %}
+	        <li class="active"><a href="{{ url_for('index') }}">评分排名</a></li>
+	        {% else %}
+	        <li class=""><a href="{{ url_for('index') }}">评分排名</a></li>
+	        {% endif %}
+	        {% if flag == "point_cost" %}
+	        <li class="active"><a href="{{ url_for('point_cost') }}">性价排名</a></li>
+	        {% else %}
+	        <li class=""><a href="{{ url_for('point_cost') }}">性价排名</a></li>
+	        {% endif %}
+	        {% if flag == "point_time" %}
+	        <li class="active"><a href="{{ url_for('point_time') }}">效率排名</a></li>
+	        {% else %}
+	        <li class=""><a href="{{ url_for('point_time') }}">效率排名</a></li>
+	        {% endif %}
+	      </ul>
+	      <p class="navbar-text navbar-right" id="time"></p>
+	    </div><!-- /.navbar-collapse -->
+	  </div><!-- /.container-fluid -->
+	</nav>
+	
+	{% if flag == "point_rank" %}  
+	<div class="alert alert-info" role="alert" style="width:67%;margin:0px auto;font-size:12px;">
+	注：最近一次比赛日中球员的范特西评分排名。范特西评分=得分+助攻*1.5+前场篮板+防守篮板*0.7+抢断*2+封盖*1.8+投篮命中数*0.4+三分命中数*0.5-失误-投篮投失数。
+	</div>
+	{% endif %}
+	{% if flag == "point_cost" %}  
+	<div class="alert alert-info" role="alert" style="width:67%;margin:0px auto;font-size:12px;">
+	注：最近一周球员范特西评分的平均值与身价的比。性价 = 最近一周范特西评分均值 / 身价。
+	</div>
+	{% endif %}
+	{% if flag == "point_time" %}  
+	<div class="alert alert-info" role="alert" style="width:67%;margin:0px auto;font-size:12px;">
+	注：最近一周球员范特西评分的总值与总上场时间的比。效率 = 最近一周范特西评分总值 / 总上场时间。
+	</div>
+	{% endif %}
+	
+	<br>
+	
+		{% if flag == "point_rank" %}  
+	    <table class="table table-hover table-bordered">
+	    	<tr>
+	    		<td><b>排名</b></td>
+	    		<td><b>球员</b></td>
+	    		<td><b>评分</b></td>
+	    		<td><b>球队</b></td>
+	    		<td><b>位置</b></td>
+	    		<td><b>日期</b></td>
+	    	</tr>
+	    	{% for p in post %}
+	    	<tr>
+	    		<td>{{ post.index(p) + 1 }}</td>
+	    		<td>{{ p.name }}</td>
+	    		<td>{{ p.fantasypoint }}</td>
+	    		<td>{{ p.team }}</td>
+	    		<td>{{ p.role }}</td>
+	    		<td>{{ p.date }}</td>
+	    	</tr>
+	    	{% endfor %}
+	    </table>
+		{% endif %}
+		
+		{% if flag == "point_cost" %}  
+	    <table class="table table-hover table-bordered">
+	    	<tr>
+	    		<td><b>排名</b></td>
+	    		<td><b>球员</b></td>
+	    		<td><b>性价</b></td>
+	    		<td><b>身价</b></td>
+	    		<td><b>球队</b></td>
+	    		<td><b>位置</b></td>
+	    	</tr>
+	    	{% for p in post %}
+	    	<tr>
+	    		<td>{{ post.index(p) + 1 }}</td>
+	    		<td>{{ p.name }}</td>
+	    		<td>{{ p.point_cost }}</td>
+	    		<td>{{ p.cost }}</td>
+	    		<td>{{ p.team }}</td>
+	    		<td>{{ p.role }}</td>
+	    	</tr>
+	    	{% endfor %}
+	    </table>
+		{% endif %}
+		
+		{% if flag == "point_time" %}  
+	    <table class="table table-hover table-bordered">
+	    	<tr>
+	    		<td><b>排名</b></td>
+	    		<td><b>球员</b></td>
+	    		<td><b>效率</b></td>
+	    		<td><b>球队</b></td>
+	    		<td><b>位置</b></td>
+	    	</tr>
+	    	{% for p in post %}
+	    	<tr>
+	    		<td>{{ post.index(p) + 1 }}</td>
+	    		<td>{{ p.name }}</td>
+	    		<td>{{ p.point_time }}</td>
+	    		<td>{{ p.team }}</td>
+	    		<td>{{ p.role }}</td>
+	    	</tr>
+	    	{% endfor %}
+	    </table>
+		{% endif %}
+	<br>
+	<footer class="footer">
+      <div class="container">
+        <p class="text-muted">
+        	Copyright © 2017 WWW.SUNSIQUAN.TOP All Rights Reserved 闽ICP备17002859号
+        </p>
+      </div>
+    </footer>
+
+    <script src="../static/js/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../static/js/bootstrap.min.js"></script>
+</body>
+{% endblock %}

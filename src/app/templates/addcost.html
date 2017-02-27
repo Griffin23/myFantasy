@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<body>
+<p style="font-weight:bold;">{{ post[0].team }}</p>
+<br>
+<form action="{{ url_for('cost2db', team = post[0].team) }}" method="post">
+{% for p in post %}
+	{% set team = p.team %}
+	{% set cost = "cost" + post.index(p)|string %}
+	<p>
+	{% for c in costs %}
+		{% if c.name == p.name %}
+		{% set costvalue = c.cost|string %}
+		<input type="hidden"  name="{{ 'name' + post.index(p)|string }}" value="{{ p.name }}">{{ p.name + " 身价：" + costvalue + " 修改为："}}</input>
+		{% endif %}
+	{% endfor %}
+		<input type="text" style="width:50px" name="{{ 'cost' + post.index(p)|string }}"/>	
+	</p>
+{% endfor %}
+	<input type="submit" value="submit to db"/>
+</form>
+<a href="{{ url_for('addcost') }}">返回</a>
+</body>
+{% endblock %}
