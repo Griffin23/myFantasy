@@ -18,6 +18,28 @@ $(function(){
 	$("table").css("width", "67%").css("margin", "0px auto").css("font-size", "12px");
 	$("footer").css("background", "linear-gradient(#0bc, #fff)");
 	$("nav").css("background", "linear-gradient(#6cc, #ccc)");
+	$(".roleselector").click(function(){
+		var count = 0;
+		//首先显示所有的记录
+		$(".table").find("tr[id!='tbhead']").each(function(){
+			$(this).children("#rank").text($(this).children("#rank").attr("record"));
+			$(this).show();
+		});
+		//根据_value属性值，将对应的记录隐藏
+		var _value = $(this).attr("_value");
+		if(_value == 'ALL')
+			return true;
+		$(".table").find("td[id='role']").each(function(){
+			if($(this).text().indexOf(_value)==-1){
+				$(this).parent("tr").hide();
+				count++;
+			}
+			else{
+				$(this).siblings("#rank").attr('record', $(this).siblings("#rank").text());
+				$(this).siblings("#rank").text($(this).siblings("#rank").text() - count);
+			}
+		});
+	});
 })
 </script>
 <body>
@@ -64,12 +86,12 @@ $(function(){
 	{% endif %}
 	{% if flag == "point_cost" %}  
 	<div class="alert alert-info" role="alert" style="width:67%;margin:0px auto;font-size:12px;">
-	注：最近一周球员范特西评分的平均值与身价的比。性价 = 最近一周范特西评分均值 / 身价。
+	注：最近两周球员范特西评分的平均值与身价的比。性价 = 最近两周范特西评分均值 / 身价。
 	</div>
 	{% endif %}
 	{% if flag == "point_time" %}  
 	<div class="alert alert-info" role="alert" style="width:67%;margin:0px auto;font-size:12px;">
-	注：最近一周球员范特西评分的总值与总上场时间的比。效率 = 最近一周范特西评分总值 / 总上场时间。
+	注：最近两周球员范特西评分的总值与总上场时间的比。效率 = 最近两周范特西评分总值 / 总上场时间。
 	</div>
 	{% endif %}
 	
@@ -77,21 +99,33 @@ $(function(){
 	
 		{% if flag == "point_rank" %}  
 	    <table class="table table-hover table-bordered">
-	    	<tr>
+	    	<tr id='tbhead'>
 	    		<td><b>排名</b></td>
 	    		<td><b>球员</b></td>
 	    		<td><b>评分</b></td>
 	    		<td><b>球队</b></td>
-	    		<td><b>位置</b></td>
+	    		<td>
+	    			<li class="dropdown">
+	    				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><b>位置</b><span class="caret"></span></a>
+	    		          <ul class="dropdown-menu">
+				            <li><a class="roleselector" href="#" _value="PG">控球后卫 - PG</a></li>
+				            <li><a class="roleselector" href="#" _value="SG">得分后卫 - SG</a></li>
+				            <li><a class="roleselector" href="#" _value="SF">小前锋 - SF</a></li>
+				            <li><a class="roleselector" href="#" _value="PF">大前锋 - PF</a></li>
+				            <li><a class="roleselector" href="#" _value="C">中锋 - C</a></li>
+				            <li><a class="roleselector" href="#" _value="ALL">显示所有</a></li>
+				          </ul>
+	    			</li>
+	    		</td>
 	    		<td><b>日期</b></td>
 	    	</tr>
 	    	{% for p in post %}
 	    	<tr>
-	    		<td>{{ post.index(p) + 1 }}</td>
+	    		<td id="rank">{{ post.index(p) + 1 }}</td>
 	    		<td>{{ p.name }}</td>
 	    		<td>{{ p.fantasypoint }}</td>
 	    		<td>{{ p.team }}</td>
-	    		<td>{{ p.role }}</td>
+	    		<td id="role">{{ p.role }}</td>
 	    		<td>{{ p.date }}</td>
 	    	</tr>
 	    	{% endfor %}
@@ -100,22 +134,34 @@ $(function(){
 		
 		{% if flag == "point_cost" %}  
 	    <table class="table table-hover table-bordered">
-	    	<tr>
+	    	<tr id='tbhead'>
 	    		<td><b>排名</b></td>
 	    		<td><b>球员</b></td>
 	    		<td><b>性价</b></td>
 	    		<td><b>身价</b></td>
 	    		<td><b>球队</b></td>
-	    		<td><b>位置</b></td>
+	    		<td>
+	    			<li class="dropdown">
+	    				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><b>位置</b><span class="caret"></span></a>
+	    		          <ul class="dropdown-menu">
+				            <li><a class="roleselector" href="#" _value="PG">控球后卫 - PG</a></li>
+				            <li><a class="roleselector" href="#" _value="SG">得分后卫 - SG</a></li>
+				            <li><a class="roleselector" href="#" _value="SF">小前锋 - SF</a></li>
+				            <li><a class="roleselector" href="#" _value="PF">大前锋 - PF</a></li>
+				            <li><a class="roleselector" href="#" _value="C">中锋 - C</a></li>
+				            <li><a class="roleselector" href="#" _value="ALL">显示所有</a></li>
+				          </ul>
+	    			</li>
+	    		</td>
 	    	</tr>
 	    	{% for p in post %}
 	    	<tr>
-	    		<td>{{ post.index(p) + 1 }}</td>
+	    		<td id="rank">{{ post.index(p) + 1 }}</td>
 	    		<td>{{ p.name }}</td>
 	    		<td>{{ p.point_cost }}</td>
 	    		<td>{{ p.cost }}</td>
 	    		<td>{{ p.team }}</td>
-	    		<td>{{ p.role }}</td>
+	    		<td id="role">{{ p.role }}</td>
 	    	</tr>
 	    	{% endfor %}
 	    </table>
@@ -123,20 +169,34 @@ $(function(){
 		
 		{% if flag == "point_time" %}  
 	    <table class="table table-hover table-bordered">
-	    	<tr>
+	    	<tr id='tbhead'>
 	    		<td><b>排名</b></td>
 	    		<td><b>球员</b></td>
 	    		<td><b>效率</b></td>
+	    		<td><b>身价</b></td>
 	    		<td><b>球队</b></td>
-	    		<td><b>位置</b></td>
+	    		<td>
+	    			<li class="dropdown">
+	    				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><b>位置</b><span class="caret"></span></a>
+	    		          <ul class="dropdown-menu">
+				            <li><a class="roleselector" href="#" _value="PG">控球后卫 - PG</a></li>
+				            <li><a class="roleselector" href="#" _value="SG">得分后卫 - SG</a></li>
+				            <li><a class="roleselector" href="#" _value="SF">小前锋 - SF</a></li>
+				            <li><a class="roleselector" href="#" _value="PF">大前锋 - PF</a></li>
+				            <li><a class="roleselector" href="#" _value="C">中锋 - C</a></li>
+				            <li><a class="roleselector" href="#" _value="ALL">显示所有</a></li>
+				          </ul>
+	    			</li>
+	    		</td>
 	    	</tr>
 	    	{% for p in post %}
 	    	<tr>
-	    		<td>{{ post.index(p) + 1 }}</td>
+	    		<td id="rank">{{ post.index(p) + 1 }}</td>
 	    		<td>{{ p.name }}</td>
 	    		<td>{{ p.point_time }}</td>
+	    		<td>{{ p.cost }}</td>
 	    		<td>{{ p.team }}</td>
-	    		<td>{{ p.role }}</td>
+	    		<td id="role">{{ p.role }}</td>
 	    	</tr>
 	    	{% endfor %}
 	    </table>

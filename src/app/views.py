@@ -124,11 +124,11 @@ def getPointCostList():
     month = strftime("%m")
     day = strftime("%d")
     today = year + "-" + month + "-" + day
-    #计算七天前的日期
-    lastweek = getLastWeek()
+    #计算两周前的日期
+    last2week = getLast2Week()
     #取得球员七天内的平均评分以及球员身价
     mysession = db.session
-    result = mysession.query(player_fantasypoint.name, func.avg(player_fantasypoint.fantasypoint), player_cost.cost, player_detail.team, player_detail.role).filter(between(player_fantasypoint.date, lastweek, today)).outerjoin(player_cost, player_fantasypoint.name == player_cost.name).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).group_by(player_fantasypoint.name).all()
+    result = mysession.query(player_fantasypoint.name, func.avg(player_fantasypoint.fantasypoint), player_cost.cost, player_detail.team, player_detail.role).filter(between(player_fantasypoint.date, last2week, today)).outerjoin(player_cost, player_fantasypoint.name == player_cost.name).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).group_by(player_fantasypoint.name).all()
     #result = mysession.query(player_fantasypoint.name, func.avg(player_fantasypoint.fantasypoint), player_cost.cost, player_detail.team, player_detail.role).filter(between(player_fantasypoint.date, '20170201', today)).outerjoin(player_cost, player_fantasypoint.name == player_cost.name).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).group_by(player_fantasypoint.name).all()
     mysession.close()
     #将获得的数据转换为实体，存放到列表
@@ -153,11 +153,11 @@ def getPointTimeList():
     month = strftime("%m")
     day = strftime("%d")
     today = year + "-" + month + "-" + day
-    #计算七天前的日期
-    lastweek = getLastWeek()
+    #计算两周前的日期
+    last2week = getLast2Week()
     #取得球员七天内的总评分以及上场时间
     mysession = db.session
-    result = mysession.query(player_fantasypoint.name, func.sum(player_fantasypoint.playtime), func.sum(player_fantasypoint.fantasypoint), player_detail.team, player_detail.role).filter(between(player_fantasypoint.date, lastweek, today)).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).group_by(player_fantasypoint.name).all()
+    result = mysession.query(player_fantasypoint.name, func.sum(player_fantasypoint.playtime), func.sum(player_fantasypoint.fantasypoint), player_detail.team, player_detail.role, player_cost.cost).filter(between(player_fantasypoint.date, last2week, today)).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).outerjoin(player_cost, player_fantasypoint.name == player_cost.name).group_by(player_fantasypoint.name).all()
     #result = mysession.query(player_fantasypoint.name, func.sum(player_fantasypoint.playtime), func.sum(player_fantasypoint.fantasypoint), player_detail.team, player_detail.role).filter(between(player_fantasypoint.date, '20170201', today)).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).group_by(player_fantasypoint.name).all()
     mysession.close()
     #存入实体player_point_time列表
@@ -173,6 +173,7 @@ def getPointTimeList():
             ppt.point_time = "%.4f" % (float(ppt.fantasypoint) / float(ppt.playtime))
         ppt.team = r.team
         ppt.role = r.role
+        ppt.cost = r.cost
         ppts.append(ppt)
     ppts.sort(reverse=True)
     return ppts;
@@ -182,31 +183,31 @@ def getIndex(list, name):
         if l.name == name:
             return list.index(l)
         
-def getLastWeek():
+def getLast2Week():
     year = strftime("%Y")
     month = strftime("%m")
     day = strftime("%d")
-    if int(day) > 7:
-        day = str(int(day) - 7) 
-    #month判定是否为1月; day=day+上个月的天数-7.
+    if int(day) > 14:
+        day = str(int(day) - 14) 
+    #month判定是否为1月; day=day+上个月的天数-14.
     elif month == "01":
         year = str(int(year) - 1) 
         month = "12"
-        day = str(int(day) + 31 - 7)
+        day = str(int(day) + 31 - 14)
     #month是否为3月，需要进行闰年判定
     elif month == "03":
         month = "02"
         if isRun(int(year)):
-            day = str(int(day) + 29 - 7)
+            day = str(int(day) + 29 - 14)
         else:
-            day = str(int(day) + 28 - 7)
+            day = str(int(day) + 28 - 14)
     #一三五七八十腊
     elif is31(month):
         month = str(int(month) - 1)  
-        day = str(int(day) + 31 - 7)
+        day = str(int(day) + 31 - 14)
     else:
         month = str(int(month) - 1)  
-        day = str(int(day) + 30 - 7)  
+        day = str(int(day) + 30 - 14)  
         
     return year + "-" + month + "-" + day  
         
