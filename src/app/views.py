@@ -4,7 +4,7 @@ from app import app,db
 from models import player_detail, player_cost, player_fantasypoint
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import desc, between
-from time import strftime
+from app.util import timeutil
 from app.util.entity import player_point_cost, player_point_time, player_rank
 from sqlalchemy.sql.functions import func
 import smtplib
@@ -14,16 +14,12 @@ from email.header import Header
 @app.route('/')
 @app.route('/index')
 def index():
-    year = strftime("%Y")
-    month = strftime("%m")
-    day = strftime("%d")
-    today = year + month + day
+    today = timeutil.getToday()
     mysession = db.session
     result = mysession.query(player_fantasypoint.date, player_fantasypoint.name, player_fantasypoint.fantasypoint, player_detail.role, player_detail.team).filter_by(date=today).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).order_by(desc(player_fantasypoint.fantasypoint)).all()
-    
     lastday = today
     while len(result) == 0:
-        lastday = getLastDay(lastday)
+        lastday = timeutil.getLastDayByNum(lastday, 1)
         result = mysession.query(player_fantasypoint.date, player_fantasypoint.name, player_fantasypoint.fantasypoint, player_detail.role, player_detail.team).filter_by(date=lastday).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).order_by(desc(player_fantasypoint.fantasypoint)).all()
     mysession.close()    
     return render_template('index.html', post=result, flag = 'point_rank')
@@ -151,12 +147,9 @@ def cost2db():
     return render_template('addcost.html', post=result, costs=costs)
 
 def getPointCostList():
-    year = strftime("%Y")
-    month = strftime("%m")
-    day = strftime("%d")
-    today = year + "-" + month + "-" + day
+    today = timeutil.getToday()
     #计算两周前的日期
-    last2week = getLast2Week()
+    last2week = timeutil.getLastDayByNum(today, 14)
     #取得球员七天内的平均评分以及球员身价
     mysession = db.session
     result = mysession.query(player_fantasypoint.name, func.avg(player_fantasypoint.fantasypoint), player_cost.cost, player_detail.team, player_detail.role).filter(between(player_fantasypoint.date, last2week, today)).outerjoin(player_cost, player_fantasypoint.name == player_cost.name).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).group_by(player_fantasypoint.name).all()
@@ -180,12 +173,9 @@ def getPointCostList():
     return ppcs
 
 def getPointTimeList():
-    year = strftime("%Y")
-    month = strftime("%m")
-    day = strftime("%d")
-    today = year + "-" + month + "-" + day
+    today = timeutil.getToday()
     #计算两周前的日期
-    last2week = getLast2Week()
+    last2week = timeutil.getLastDayByNum(today, 14)
     #取得球员七天内的总评分以及上场时间
     mysession = db.session
     result = mysession.query(player_fantasypoint.name, func.sum(player_fantasypoint.playtime), func.sum(player_fantasypoint.fantasypoint), player_detail.team, player_detail.role, player_cost.cost).filter(between(player_fantasypoint.date, last2week, today)).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).outerjoin(player_cost, player_fantasypoint.name == player_cost.name).group_by(player_fantasypoint.name).all()
@@ -213,80 +203,4 @@ def getIndex(list, name):
     for l in list:
         if l.name == name:
             return list.index(l)
-        
-def getLastDay(thisday):
-    year = thisday[0:4]
-    month = thisday[4:6]
-    day = thisday[6:8]
-    if int(day) > 1:
-        day = str(int(day) - 1) 
-    #month判定是否为1月; day=day+上个月的天数-14.
-    elif month == "01":
-        year = str(int(year) - 1) 
-        month = "12"
-        day = str(int(day) + 31 - 1)
-    #month是否为3月，需要进行闰年判定
-    elif month == "03":
-        month = "02"
-        if isRun(int(year)):
-            day = str(int(day) + 29 - 1)
-        else:
-            day = str(int(day) + 28 - 1)
-    #一三五七八十腊
-    elif is31(month):
-        month = str(int(month) - 1)  
-        day = str(int(day) + 31 - 1)
-    else:
-        month = str(int(month) - 1)  
-        day = str(int(day) + 30 - 1) 
-    
-    if len(month) == 1:
-        month = '0' + month 
-    if len(day) == 1:
-        day = '0' + day 
-    return year + month + day      
 
-def getLast2Week():
-    year = strftime("%Y")
-    month = strftime("%m")
-    day = strftime("%d")
-    if int(day) > 14:
-        day = str(int(day) - 14) 
-    #month判定是否为1月; day=day+上个月的天数-14.
-    elif month == "01":
-        year = str(int(year) - 1) 
-        month = "12"
-        day = str(int(day) + 31 - 14)
-    #month是否为3月，需要进行闰年判定
-    elif month == "03":
-        month = "02"
-        if isRun(int(year)):
-            day = str(int(day) + 29 - 14)
-        else:
-            day = str(int(day) + 28 - 14)
-    #一三五七八十腊
-    elif is31(month):
-        month = str(int(month) - 1)  
-        day = str(int(day) + 31 - 14)
-    else:
-        month = str(int(month) - 1)  
-        day = str(int(day) + 30 - 14)  
-    
-    if len(month) == 1:
-        month = '0' + month 
-    if len(day) == 1:
-        day = '0' + day    
-    return year + "-" + month + "-" + day  
-        
-def isRun(year):
-    if (year % 4 == 0) and (year % 100 != 0):
-        return True
-    elif year % 400 == 0:
-        return True
-    else:
-        return False
-def is31(month):
-    if month == "2" or month == "4" or month == "6" or month == "8" or month == "9" or month == "11":
-        return True
-    else:
-        return False
