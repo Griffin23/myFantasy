@@ -7,6 +7,9 @@ from sqlalchemy import desc, between
 from time import strftime
 from app.util.entity import player_point_cost, player_point_time, player_rank
 from sqlalchemy.sql.functions import func
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
 
 @app.route('/')
 @app.route('/index')
@@ -14,13 +17,14 @@ def index():
     year = strftime("%Y")
     month = strftime("%m")
     day = strftime("%d")
-    today = year + "-" + month + "-" + day
+    today = year + month + day
     mysession = db.session
     result = mysession.query(player_fantasypoint.date, player_fantasypoint.name, player_fantasypoint.fantasypoint, player_detail.role, player_detail.team).filter_by(date=today).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).order_by(desc(player_fantasypoint.fantasypoint)).all()
+    
+    lastday = today
     while len(result) == 0:
-        day = str(int(day) - 1)
-        yesterday = year + "-" + month + "-" + day
-        result = mysession.query(player_fantasypoint.date, player_fantasypoint.name, player_fantasypoint.fantasypoint, player_detail.role, player_detail.team).filter_by(date=yesterday).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).order_by(desc(player_fantasypoint.fantasypoint)).all()
+        lastday = getLastDay(lastday)
+        result = mysession.query(player_fantasypoint.date, player_fantasypoint.name, player_fantasypoint.fantasypoint, player_detail.role, player_detail.team).filter_by(date=lastday).outerjoin(player_detail, player_fantasypoint.name == player_detail.name).order_by(desc(player_fantasypoint.fantasypoint)).all()
     mysession.close()    
     return render_template('index.html', post=result, flag = 'point_rank')
     
@@ -32,7 +36,11 @@ def point_cost():
 @app.route('/point_time')
 def point_time():
     ppts = getPointTimeList()
-    return render_template('index.html', post=ppts, flag="point_time")    
+    return render_template('index.html', post=ppts, flag="point_time")  
+
+@app.route('/suggest')  
+def suggest():
+    return render_template('index.html', flag="suggest") 
    
 @app.route('/sunsiquan')
 def sunsiquan():
@@ -53,6 +61,29 @@ def sunsiquan():
     prs.sort()
     return render_template('test.html', post=prs)
 
+@app.route('/sendmail', methods = ['GET', 'POST'])
+def sendmail():
+    email =  request.form.get('email')
+    suggestion = request.form.get('suggestion')
+    
+    mail_host = app.config['MAIL_HOST']
+    mail_user = app.config['MAIL_USERNAME']
+    mail_pass = app.config['MAIL_PASSWORD']
+    
+    sender = mail_user
+    receivers = mail_user
+    message = MIMEText(suggestion, 'plain', 'utf-8')
+    message['From'] = Header(email, 'utf-8')
+    message['To'] =  Header("我", 'utf-8')
+    subject = 'Fantasy留言建议'
+    message['Subject'] = Header(subject, 'utf-8')
+    
+    smtpObj = smtplib.SMTP_SSL('smtp.qq.com',465)
+    smtpObj.login(mail_user,mail_pass)  
+    smtpObj.sendmail(sender, receivers, message.as_string())
+
+    return render_template('index.html')
+    
 @app.route('/addrole')
 def addrole():
     #判断是否已经选择球队
@@ -183,6 +214,38 @@ def getIndex(list, name):
         if l.name == name:
             return list.index(l)
         
+def getLastDay(thisday):
+    year = thisday[0:4]
+    month = thisday[4:6]
+    day = thisday[6:8]
+    if int(day) > 1:
+        day = str(int(day) - 1) 
+    #month判定是否为1月; day=day+上个月的天数-14.
+    elif month == "01":
+        year = str(int(year) - 1) 
+        month = "12"
+        day = str(int(day) + 31 - 1)
+    #month是否为3月，需要进行闰年判定
+    elif month == "03":
+        month = "02"
+        if isRun(int(year)):
+            day = str(int(day) + 29 - 1)
+        else:
+            day = str(int(day) + 28 - 1)
+    #一三五七八十腊
+    elif is31(month):
+        month = str(int(month) - 1)  
+        day = str(int(day) + 31 - 1)
+    else:
+        month = str(int(month) - 1)  
+        day = str(int(day) + 30 - 1) 
+    
+    if len(month) == 1:
+        month = '0' + month 
+    if len(day) == 1:
+        day = '0' + day 
+    return year + month + day      
+
 def getLast2Week():
     year = strftime("%Y")
     month = strftime("%m")
@@ -208,7 +271,11 @@ def getLast2Week():
     else:
         month = str(int(month) - 1)  
         day = str(int(day) + 30 - 14)  
-        
+    
+    if len(month) == 1:
+        month = '0' + month 
+    if len(day) == 1:
+        day = '0' + day    
     return year + "-" + month + "-" + day  
         
 def isRun(year):

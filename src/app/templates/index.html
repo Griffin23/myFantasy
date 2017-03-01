@@ -16,6 +16,7 @@ $(function(){
 	$("#time").text(currentTime()).css("margin-right", "1px");
 	$("td").css("width", "10%");
 	$("table").css("width", "67%").css("margin", "0px auto").css("font-size", "12px");
+	$("form").css("width", "50%").css("margin", "0px auto").css("font-size", "12px");
 	$("footer").css("background", "linear-gradient(#0bc, #fff)");
 	$("nav").css("background", "linear-gradient(#6cc, #ccc)");
 	$(".roleselector").click(function(){
@@ -72,6 +73,11 @@ $(function(){
 	        <li class="active"><a href="{{ url_for('point_time') }}">效率排名</a></li>
 	        {% else %}
 	        <li class=""><a href="{{ url_for('point_time') }}">效率排名</a></li>
+	        {% endif %}
+	        {% if flag == "suggest" %}
+	        <li class="active"><a href="#">留言建议</a></li>
+	        {% else %}
+	        <li class=""><a href="{{ url_for('suggest') }}">留言建议</a></li>
 	        {% endif %}
 	      </ul>
 	      <p class="navbar-text navbar-right" id="time"></p>
@@ -200,6 +206,20 @@ $(function(){
 	    	</tr>
 	    	{% endfor %}
 	    </table>
+		{% endif %}
+		{% if flag == "suggest" %} 
+		<br> <br> <br> <br> 
+		<form action="{{ url_for('sendmail') }}" method="post">
+  			<div class="form-group">
+    			<label for="exampleInputEmail1">Email</label>
+    			<input type="email" class="form-control suggest" id="exampleInputEmail1" placeholder="Email" name="email">
+  			</div>
+  			<div class="form-group">
+    			<label for="exampleInputPassword1">留言建议（将会以邮件的形式发送）</label>
+    			<textarea class="form-control suggest" rows="5" name="suggestion"></textarea>
+  			</div>
+  				<button type="submit" class="btn btn-default">Submit</button>
+		</form>
 		{% endif %}
 	<br>
 	<footer class="footer">
