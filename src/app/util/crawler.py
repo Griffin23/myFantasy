@@ -9,17 +9,7 @@ from app.util.entity import player
 from app import db
 from app.models import player_detail, player_fantasypoint, player_cost
 from time import strftime
-
-
-
-
-from sqlalchemy.sql.functions import func
-from sqlalchemy import between
-
-
-
-
-
+from app.util.timeutil import getLastDayByNum
 
 def getPlayers(response_content):
     #re.S表示可以用.匹配换行符
@@ -37,19 +27,11 @@ def getPlayers(response_content):
     return player_list
      
 def getFantasyPoint():
-    #获取系统时间（日期为美国时间）
-    year = strftime("%Y")
-    month = strftime("%m")
-    #day = str(int(strftime("%d")) - 1)
-    day = strftime("%d")
-    if day == "01":
-        if month == "01":
-            month = "12"
-        else:
-            month = str(int(month) - 1)
-        day = str(int(day) - 1)
-    else:
-        day = str(int(strftime("%d")) - 1)
+    thisday = strftime("%Y%m%d")
+    yesterday = getLastDayByNum(thisday, 1)
+    year = yesterday[0:4]
+    month = yesterday[4:6]
+    day = yesterday[6:8]
     player_list = []
     for i in range(3):
         url = 'http://www.stat-nba.com/query.php?page=' + str(i) + '&crtcol=formular&order=1&QueryType=game&GameType=season&Formular=ptsaddastmultiply1.5addorbadddrbmultiply0.7addstlmultiply2addblkmultiply1.8substracttovaddfgmultiply0.4substractleftbracketfgasubstractfgrightbracketaddthreepmultiply0.5&PageNum=500&Year0=' + year +'&Month0=' + month +'&Day0=' + day +'&Year1=' + year +'&Month1=' + month +'&Day1=' + day +'#label_show_result'
@@ -95,7 +77,7 @@ def getPlayerDetail():
     
 if __name__ == '__main__':
     #getPlayerDetail()
-    #getFantasyPoint()
+    getFantasyPoint()
 
 
 #     try:

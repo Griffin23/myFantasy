@@ -4,12 +4,13 @@ from app import app,db
 from models import player_detail, player_cost, player_fantasypoint
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import desc, between
-from app.util import timeutil
+from app.util import timeutil, randomcode
 from app.util.entity import player_point_cost, player_point_time, player_rank
 from sqlalchemy.sql.functions import func
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
+import StringIO
 
 @app.route('/')
 @app.route('/index')
@@ -57,29 +58,39 @@ def sunsiquan():
     prs.sort()
     return render_template('test.html', post=prs)
 
-@app.route('/sendmail', methods = ['GET', 'POST'])
+@app.route('/sendmail', methods = ['POST'])
 def sendmail():
-    email =  request.form.get('email')
-    suggestion = request.form.get('suggestion')
-    
-    mail_host = app.config['MAIL_HOST']
-    mail_user = app.config['MAIL_USERNAME']
-    mail_pass = app.config['MAIL_PASSWORD']
-    
-    sender = mail_user
-    receivers = mail_user
-    message = MIMEText(suggestion, 'plain', 'utf-8')
-    message['From'] = Header(email, 'utf-8')
-    message['To'] =  Header("我", 'utf-8')
-    subject = 'Fantasy留言建议'
-    message['Subject'] = Header(subject, 'utf-8')
-    
-    smtpObj = smtplib.SMTP_SSL('smtp.qq.com',465)
-    smtpObj.login(mail_user,mail_pass)  
-    smtpObj.sendmail(sender, receivers, message.as_string())
+#     email =  request.form.get('email')
+#     suggestion = request.form.get('suggestion')
+#     
+#     mail_host = app.config['MAIL_HOST']
+#     mail_user = app.config['MAIL_USERNAME']
+#     mail_pass = app.config['MAIL_PASSWORD']
+#     
+#     sender = mail_user
+#     receivers = mail_user
+#     message = MIMEText(suggestion, 'plain', 'utf-8')
+#     message['From'] = Header(email, 'utf-8')
+#     message['To'] =  Header("我", 'utf-8')
+#     subject = 'Fantasy留言建议'
+#     message['Subject'] = Header(subject, 'utf-8')
+#     
+#     smtpObj = smtplib.SMTP_SSL('smtp.qq.com',465)
+#     smtpObj.login(mail_user,mail_pass)  
+#     smtpObj.sendmail(sender, receivers, message.as_string())
 
     return render_template('index.html')
-    
+
+@app.route('/getrandomcode')
+def getrandomcode():
+    code_img = randomcode.create_validate_code()[0]
+    buf = StringIO.StringIO()
+    code_img.save(buf,'JPEG') 
+    buf_str = buf.getvalue() 
+    response = app.make_response(buf_str)
+    response.headers['Content-Type'] = 'image/jpeg'
+    return response
+
 @app.route('/addrole')
 def addrole():
     #判断是否已经选择球队
@@ -203,4 +214,4 @@ def getIndex(list, name):
     for l in list:
         if l.name == name:
             return list.index(l)
-
+    
