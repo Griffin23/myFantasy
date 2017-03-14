@@ -7,10 +7,8 @@ from sqlalchemy import desc, between
 from app.util import timeutil, randomcode
 from app.util.entity import player_point_cost, player_point_time, player_rank
 from sqlalchemy.sql.functions import func
-import smtplib
-from email.mime.text import MIMEText
-from email.header import Header
 import StringIO
+from app.util.mailutil import sendMail
 
 @app.route('/')
 @app.route('/index')
@@ -69,22 +67,10 @@ def sendmail():
     if userRandomCode.upper() != imgRandomCode.upper():
         return render_template('index.html', flag="suggest", randomCode="0")
     else:
-        mail_host = app.config['MAIL_HOST']
-        mail_user = app.config['MAIL_USERNAME']
-        mail_pass = app.config['MAIL_PASSWORD']
-         
-        sender = mail_user
-        receivers = mail_user
-        message = MIMEText(suggestion, 'plain', 'utf-8')
-        message['From'] = Header(email, 'utf-8')
-        message['To'] =  Header("我", 'utf-8')
+        fromMail = email
         subject = 'Fantasy留言建议'
-        message['Subject'] = Header(subject, 'utf-8')
-         
-        smtpObj = smtplib.SMTP_SSL('smtp.qq.com',465)
-        smtpObj.login(mail_user,mail_pass)  
-        smtpObj.sendmail(sender, receivers, message.as_string())
-    
+        content = suggestion
+        sendMail(fromMail, subject, content)
         return render_template('index.html', flag="suggest", randomCode="1")
 
 @app.route('/getrandomcode<regex("[0-9]*"):salt>')
