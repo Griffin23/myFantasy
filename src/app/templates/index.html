@@ -1,54 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <script src="../static/js/jquery-3.1.1.js"></script>
-<script type="text/javascript">
-	function currentTime(){
-		var d = new Date();
-		time = "";
-		time += d.getFullYear() + "-";
-		time += d.getMonth() + 1 + "-";
-		time += d.getDate();
-		return time
-	}
-</script>
-<script type="text/javascript">
-$(function(){
-	$("#time").text(currentTime()).css("margin-right", "1px");
-	$("td").css("width", "10%");
-	$("table").css("width", "67%").css("margin", "0px auto").css("font-size", "12px");
-	$("form").css("width", "50%").css("margin", "0px auto").css("font-size", "12px");
-	$("footer").css("background", "linear-gradient(#0bc, #fff)");
-	$("nav").css("background", "linear-gradient(#6cc, #ccc)");
-	$(".roleselector").click(function(){
-		var count = 0;
-		//首先显示所有的记录
-		$(".table").find("tr[id!='tbhead']").each(function(){
-			$(this).children("#rank").text($(this).children("#rank").attr("record"));
-			$(this).show();
-		});
-		//根据_value属性值，将对应的记录隐藏
-		var _value = $(this).attr("_value");
-		if(_value == 'ALL')
-			return true;
-		$(".table").find("td[id='role']").each(function(){
-			if($(this).text().indexOf(_value)==-1){
-				$(this).parent("tr").hide();
-				count++;
-			}
-			else{
-				$(this).siblings("#rank").attr('record', $(this).siblings("#rank").text());
-				$(this).siblings("#rank").text($(this).siblings("#rank").text() - count);
-			}
-		});
-	});
-	$("#submit").click(function(){
-		if($.trim($("#suggestion").val()) == ""){
-			alert("请确认已经输入您的建议！");
-			return false;
-		}
-	});
-})
-</script>
+<script src="../static/js/index.js"></script>
 <body>
 	<nav class="navbar navbar-default">
 	  <div class="container-fluid">
@@ -81,7 +34,7 @@ $(function(){
 	        <li class=""><a href="{{ url_for('point_time') }}">效率排名</a></li>
 	        {% endif %}
 	        {% if flag == "suggest" %}
-	        <li class="active"><a href="#">留言建议</a></li>
+	        <li class="active"><a href="{{ url_for('suggest') }}">留言建议</a></li>
 	        {% else %}
 	        <li class=""><a href="{{ url_for('suggest') }}">留言建议</a></li>
 	        {% endif %}
@@ -223,8 +176,10 @@ $(function(){
   			<div class="form-group">
     			<label for="exampleInputPassword1">留言建议（将会以邮件的形式发送）</label>
     			<textarea class="form-control suggest" rows="5" name="suggestion" id="suggestion"></textarea>
-  			<img src="{{ url_for('getrandomcode') }}">
-  			<button type="submit" class="btn btn-default" id="submit" style="float:right;">Submit</button>
+    			<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+    			<img id="randomCodeImg" src="{{ url_for('getrandomcode', salt='0') }}">
+  				<input type="text" class="form-control" name="randomCode" maxLength=4 placeholder="验证码" style="width:10%;float:left;">
+  				<button type="submit" class="btn btn-default" id="submit" style="float:right;">Submit</button>
   			</div>
 		</form>
 		{% endif %}

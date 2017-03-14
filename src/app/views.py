@@ -1,5 +1,5 @@
 #-*- coding: utf-8 -*- 
-from flask import render_template, request
+from flask import render_template, request, session
 from app import app,db
 from models import player_detail, player_cost, player_fantasypoint
 from sqlalchemy.sql.expression import distinct
@@ -60,30 +60,36 @@ def sunsiquan():
 
 @app.route('/sendmail', methods = ['POST'])
 def sendmail():
-#     email =  request.form.get('email')
-#     suggestion = request.form.get('suggestion')
-#     
-#     mail_host = app.config['MAIL_HOST']
-#     mail_user = app.config['MAIL_USERNAME']
-#     mail_pass = app.config['MAIL_PASSWORD']
-#     
-#     sender = mail_user
-#     receivers = mail_user
-#     message = MIMEText(suggestion, 'plain', 'utf-8')
-#     message['From'] = Header(email, 'utf-8')
-#     message['To'] =  Header("我", 'utf-8')
-#     subject = 'Fantasy留言建议'
-#     message['Subject'] = Header(subject, 'utf-8')
-#     
-#     smtpObj = smtplib.SMTP_SSL('smtp.qq.com',465)
-#     smtpObj.login(mail_user,mail_pass)  
-#     smtpObj.sendmail(sender, receivers, message.as_string())
+    email =  request.form.get('email')
+    suggestion = request.form.get('suggestion')
+    randomCode = request.form.get('randomCode')
+    
+    #校验验证码是否正确
+    
+    
+    mail_host = app.config['MAIL_HOST']
+    mail_user = app.config['MAIL_USERNAME']
+    mail_pass = app.config['MAIL_PASSWORD']
+     
+    sender = mail_user
+    receivers = mail_user
+    message = MIMEText(suggestion + " randomcode is: " + randomCode + "session randomCode is: " + session['randomCode'], 'plain', 'utf-8')
+    message['From'] = Header(email, 'utf-8')
+    message['To'] =  Header("我", 'utf-8')
+    subject = 'Fantasy留言建议'
+    message['Subject'] = Header(subject, 'utf-8')
+     
+    smtpObj = smtplib.SMTP_SSL('smtp.qq.com',465)
+    smtpObj.login(mail_user,mail_pass)  
+    smtpObj.sendmail(sender, receivers, message.as_string())
 
     return render_template('index.html')
 
-@app.route('/getrandomcode')
-def getrandomcode():
-    code_img = randomcode.create_validate_code()[0]
+@app.route('/getrandomcode<regex("[0-9]*"):salt>')
+def getrandomcode(salt):
+    createImg_result = randomcode.create_validate_code()
+    code_img = createImg_result[0]
+    session['randomCode'] = createImg_result[1]
     buf = StringIO.StringIO()
     code_img.save(buf,'JPEG') 
     buf_str = buf.getvalue() 
