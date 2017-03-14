@@ -62,28 +62,30 @@ def sunsiquan():
 def sendmail():
     email =  request.form.get('email')
     suggestion = request.form.get('suggestion')
-    randomCode = request.form.get('randomCode')
+    userRandomCode = request.form.get('randomCode')
+    imgRandomCode = session['randomCode']
     
     #校验验证码是否正确
+    if userRandomCode.upper() != imgRandomCode.upper():
+        return render_template('index.html', flag="suggest", randomCode="0")
+    else:
+        mail_host = app.config['MAIL_HOST']
+        mail_user = app.config['MAIL_USERNAME']
+        mail_pass = app.config['MAIL_PASSWORD']
+         
+        sender = mail_user
+        receivers = mail_user
+        message = MIMEText(suggestion, 'plain', 'utf-8')
+        message['From'] = Header(email, 'utf-8')
+        message['To'] =  Header("我", 'utf-8')
+        subject = 'Fantasy留言建议'
+        message['Subject'] = Header(subject, 'utf-8')
+         
+        smtpObj = smtplib.SMTP_SSL('smtp.qq.com',465)
+        smtpObj.login(mail_user,mail_pass)  
+        smtpObj.sendmail(sender, receivers, message.as_string())
     
-    
-    mail_host = app.config['MAIL_HOST']
-    mail_user = app.config['MAIL_USERNAME']
-    mail_pass = app.config['MAIL_PASSWORD']
-     
-    sender = mail_user
-    receivers = mail_user
-    message = MIMEText(suggestion + " randomcode is: " + randomCode + "session randomCode is: " + session['randomCode'], 'plain', 'utf-8')
-    message['From'] = Header(email, 'utf-8')
-    message['To'] =  Header("我", 'utf-8')
-    subject = 'Fantasy留言建议'
-    message['Subject'] = Header(subject, 'utf-8')
-     
-    smtpObj = smtplib.SMTP_SSL('smtp.qq.com',465)
-    smtpObj.login(mail_user,mail_pass)  
-    smtpObj.sendmail(sender, receivers, message.as_string())
-
-    return render_template('index.html')
+        return render_template('index.html', flag="suggest", randomCode="1")
 
 @app.route('/getrandomcode<regex("[0-9]*"):salt>')
 def getrandomcode(salt):

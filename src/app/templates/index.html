@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-<script src="../static/js/jquery-3.1.1.js"></script>
 <script src="../static/js/index.js"></script>
 <body>
 	<nav class="navbar navbar-default">
@@ -168,6 +167,12 @@
 		{% endif %}
 		{% if flag == "suggest" %} 
 		<br> <br> <br> <br> 
+    	{% if randomCode=="0" %}
+		<div class="alert alert-danger" role="alert" style="font-size:12px;width:50%;margin:0px auto;">提示：您输入的验证码有误，请重新输入！</div><br> 
+		{% endif %}
+    	{% if randomCode=="1" %}
+		<div class="alert alert-success" role="alert" style="width:50%;margin:0px auto;">提示：邮件已发送，感谢您的建议！</div><br> 
+		{% endif %}
 		<form action="{{ url_for('sendmail') }}" method="post">
   			<div class="form-group">
     			<label for="exampleInputEmail1">Email</label>
