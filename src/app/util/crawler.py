@@ -10,6 +10,7 @@ from app import db
 from app.models import player_detail, player_fantasypoint, player_cost
 from time import strftime
 from app.util.timeutil import getLastDayByNum
+from sqlalchemy import desc
 
 def getPlayers(response_content):
     #re.S表示可以用.匹配换行符
@@ -26,24 +27,38 @@ def getPlayers(response_content):
         player_list.append(p)   
     return player_list
      
-def getFantasyPoint():
-    thisday = strftime("%Y%m%d")
-    yesterday = getLastDayByNum(thisday, 1)
-    year = yesterday[0:4]
-    month = yesterday[4:6]
-    day = yesterday[6:8]
-    player_list = []
-    for i in range(3):
-        url = 'http://www.stat-nba.com/query.php?page=' + str(i) + '&crtcol=formular&order=1&QueryType=game&GameType=season&Formular=ptsaddastmultiply1.5addorbadddrbmultiply0.7addstlmultiply2addblkmultiply1.8substracttovaddfgmultiply0.4substractleftbracketfgasubstractfgrightbracketaddthreepmultiply0.5&PageNum=500&Year0=' + year +'&Month0=' + month +'&Day0=' + day +'&Year1=' + year +'&Month1=' + month +'&Day1=' + day +'#label_show_result'
-        r = requests.get(url)
-        r.encoding = 'utf-8'
-        player_list = player_list + getPlayers(r.text)
-    #操作数据库
+def getFromday():
     mysession = db.session
-    for i in range(len(player_list)):
-        p = player_fantasypoint(name = player_list[i].name, fantasypoint = player_list[i].fantasy_point, date = strftime("%Y%m%d"), playtime = player_list[i].playtime)
-        mysession.add(p)
-    mysession.commit()
+    fromday = mysession.query(player_fantasypoint.date).order_by(desc(player_fantasypoint.date)).limit(1).one()[0]
+    mysession.close()
+    fromday = ''.join(str(fromday).split('-'))
+    return fromday
+
+#应该注意url中的时间为美国时间
+def getFantasyPoint():
+    fromday = getFromday()
+    thisday = strftime("%Y%m%d")
+    while True:
+        db_day = thisday
+        thisday = getLastDayByNum(thisday, 1)
+        year = thisday[0:4]
+        month = thisday[4:6]
+        day = thisday[6:8]
+        player_list = []
+        for i in range(3):
+            url = 'http://www.stat-nba.com/query.php?page=' + str(i) + '&crtcol=formular&order=1&QueryType=game&GameType=season&Formular=ptsaddastmultiply1.5addorbadddrbmultiply0.7addstlmultiply2addblkmultiply1.8substracttovaddfgmultiply0.4substractleftbracketfgasubstractfgrightbracketaddthreepmultiply0.5&PageNum=500&Year0=' + year +'&Month0=' + month +'&Day0=' + day +'&Year1=' + year +'&Month1=' + month +'&Day1=' + day +'#label_show_result'
+            r = requests.get(url)
+            r.encoding = 'utf-8'
+            player_list = player_list + getPlayers(r.text)
+        #操作数据库
+        mysession = db.session
+        for i in range(len(player_list)):
+            p = player_fantasypoint(name = player_list[i].name, fantasypoint = player_list[i].fantasy_point, date = db_day, playtime = player_list[i].playtime)
+            mysession.add(p)
+        mysession.commit()
+        if thisday == fromday:
+            break
+    mysession.close()
     print '\ncomplete!'
     
 def getPlayerDetail():
@@ -73,17 +88,10 @@ def getPlayerDetail():
                 mysession.add(c)
         mysession.commit()
         print '.',
+    mysession.close()
     print '\ncomplete!'
     
 if __name__ == '__main__':
     #getPlayerDetail()
-    getFantasyPoint()
-
-
-#     try:
-#         getFantasyPoint()
-#     except Exception:
-#         getPlayerDetail()
-#         getFantasyPoint()
-#     else:
-        
+    #getFantasyPoint()
+    getFromday()
