@@ -34,3 +34,13 @@ class player_point_time():
     
     def __lt__(self, other):  
         return self.point_time < other.point_time
+    
+class player_point_forecast():
+    name = ''
+    fantasypoint = ''
+    playtime = ''
+    team = ''
+    role = ''
+    
+    def __lt__(self, other):  
+        return self.fantasypoint < other.fantasypoint

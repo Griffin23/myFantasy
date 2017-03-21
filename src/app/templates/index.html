@@ -32,11 +32,16 @@
 	        {% else %}
 	        <li class=""><a id="unchosed" class="unchosedfont" href="{{ url_for('point_time') }}">效率排名</a></li>
 	        {% endif %}
+	        {% if flag == "point_forecast" %}
+	        <li><a id="chosed" href="{{ url_for('point_forecast') }}">评分预测</a></li>
+	        {% else %}
+	        <li class=""><a id="unchosed" class="unchosedfont" href="{{ url_for('point_forecast') }}">评分预测</a></li>
+	        {% endif %}
 	        {% if flag == "suggest" %}
 	        <li><a id="chosed" href="{{ url_for('suggest') }}">留言建议</a></li>
 	        {% else %}
 	        <li class=""><a id="unchosed" class="unchosedfont" href="{{ url_for('suggest') }}">留言建议</a></li>
-	        {% endif %}
+	        {% endif %}	  
 	      </ul>
 	      <p class="navbar-text navbar-right" id="time"></p>
 	    </div><!-- /.navbar-collapse -->
@@ -58,7 +63,11 @@
 	注：最近两周球员范特西评分的总值与总上场时间的比。效率 = 最近两周范特西评分总值 / 总上场时间。
 	</div>
 	{% endif %}
-
+	{% if flag == "point_forecast" %}  
+	<div class="alert alert-info" role="alert" style="width:67%;margin:0px auto;font-size:12px;">
+	注：根据球员最近两周比赛的出场时间和范特西评分，利用线性回归分析，预测球员在下一场比赛的出场时间，再根据效率值进而预测范特西评分。
+	</div>
+	{% endif %}
 	<br>
 	
 		{% if flag == "point_rank" %}  
@@ -165,6 +174,42 @@
 	    	{% endfor %}
 	    </table>
 		{% endif %}
+		
+		{% if flag == "point_forecast" %}  
+	    <table class="table table-hover table-bordered">
+	    	<tr id='tbhead'>
+	    		<td><b>排名</b></td>
+	    		<td><b>球员</b></td>
+	    		<td><b>评分</b></td>
+	    		<td><b>出场时间</b></td>
+	    		<td><b>球队</b></td>
+	    		<td>
+	    			<li class="dropdown">
+	    				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><b>位置</b><span class="caret"></span></a>
+	    		          <ul class="dropdown-menu">
+				            <li><a class="roleselector" href="#" _value="PG">控球后卫 - PG</a></li>
+				            <li><a class="roleselector" href="#" _value="SG">得分后卫 - SG</a></li>
+				            <li><a class="roleselector" href="#" _value="SF">小前锋 - SF</a></li>
+				            <li><a class="roleselector" href="#" _value="PF">大前锋 - PF</a></li>
+				            <li><a class="roleselector" href="#" _value="C">中锋 - C</a></li>
+				            <li><a class="roleselector" href="#" _value="ALL">显示所有</a></li>
+				          </ul>
+	    			</li>
+	    		</td>
+	    	</tr>
+	    	{% for p in post %}
+	    	<tr>
+	    		<td id="rank">{{ post.index(p) + 1 }}</td>
+	    		<td>{{ p.name }}</td>
+	    		<td>{{ p.fantasypoint}}</td>
+	    		<td>{{ p.playtime }}</td>
+	    		<td>{{ p.team }}</td>
+	    		<td id="role">{{ p.role }}</td>
+	    	</tr>
+	    	{% endfor %}
+	    </table>
+		{% endif %}		
+		
 		{% if flag == "suggest" %} 
 		<br>
     	{% if randomCode=="0" %}

@@ -1,0 +1,2823 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+	    <meta charset="utf-8">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	    <meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>数据范特西</title>
+		<link href="../static/css/bootstrap.min.css" rel="stylesheet">
+		<link href="../static/css/sticky-footer.css" rel="stylesheet">
+		<link href="../static/css/common.css" rel="stylesheet">
+		<script src="../static/js/jquery-3.1.1.js"></script>
+		<!--style type="text/css"> 
+		body{
+			background: linear-gradient(#ccc, #0bc);
+		}</style--> 
+		<link href="../static/image/favicon.ico" rel="icon" type="image/x-icon" />
+	</head>
+
+<script src="../static/js/index.js"></script>
+<body>
+	<nav class="navbar navbar-default">
+	  <div class="container-fluid">
+	    <!-- Brand and toggle get grouped for better mobile display -->
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	    </div>
+	
+	    <!-- Collect the nav links, forms, and other content for toggling -->
+	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="width:70%;margin:0px auto;">
+	      <ul class="nav navbar-nav">
+	      	
+	        <li class=""><a id="unchosed" class="unchosedfont" href="/index">评分排名</a></li>
+	        
+	        
+	        <li class=""><a id="unchosed" class="unchosedfont" href="/point_cost">性价排名</a></li>
+	        
+	        
+	        <li class=""><a id="unchosed" class="unchosedfont" href="/point_time">效率排名</a></li>
+	        
+	        
+	        <li><a id="chosed" href="/point_forecast">评分预测</a></li>
+	        
+	        
+	        <li class=""><a id="unchosed" class="unchosedfont" href="/suggest">留言建议</a></li>
+	        	  
+	      </ul>
+	      <p class="navbar-text navbar-right" id="time"></p>
+	    </div><!-- /.navbar-collapse -->
+	  </div><!-- /.container-fluid -->
+	</nav>
+	
+	
+	
+	
+	  
+	<div class="alert alert-info" role="alert" style="width:67%;margin:0px auto;font-size:12px;">
+	注：根据球员最近两周比赛的出场时间和范特西评分，利用线性回归分析，预测球员在下一场比赛的出场时间，再根据效率值进而预测范特西评分。
+	</div>
+	
+	<br>
+	
+		
+		
+		
+		
+		
+		
+		  
+	    <table class="table table-hover table-bordered">
+	    	<tr id='tbhead'>
+	    		<td><b>排名</b></td>
+	    		<td><b>球员</b></td>
+	    		<td><b>评分</b></td>
+	    		<td><b>出场时间</b></td>
+	    		<td><b>球队</b></td>
+	    		<td>
+	    			<li class="dropdown">
+	    				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><b>位置</b><span class="caret"></span></a>
+	    		          <ul class="dropdown-menu">
+				            <li><a class="roleselector" href="#" _value="PG">控球后卫 - PG</a></li>
+				            <li><a class="roleselector" href="#" _value="SG">得分后卫 - SG</a></li>
+				            <li><a class="roleselector" href="#" _value="SF">小前锋 - SF</a></li>
+				            <li><a class="roleselector" href="#" _value="PF">大前锋 - PF</a></li>
+				            <li><a class="roleselector" href="#" _value="C">中锋 - C</a></li>
+				            <li><a class="roleselector" href="#" _value="ALL">显示所有</a></li>
+				          </ul>
+	    			</li>
+	    		</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">1</td>
+	    		<td>詹姆斯-哈登</td>
+	    		<td>49.8</td>
+	    		<td>37</td>
+	    		<td>休斯顿火箭队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">2</td>
+	    		<td>拉塞尔-威斯布鲁克</td>
+	    		<td>49.3</td>
+	    		<td>32</td>
+	    		<td>俄克拉荷马雷霆队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">3</td>
+	    		<td>勒布朗-詹姆斯</td>
+	    		<td>42.0</td>
+	    		<td>35</td>
+	    		<td>克里夫兰骑士队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">4</td>
+	    		<td>卡尔-安东尼-唐斯</td>
+	    		<td>40.9</td>
+	    		<td>39</td>
+	    		<td>明尼苏达森林狼队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">5</td>
+	    		<td>安东尼-戴维斯</td>
+	    		<td>37.8</td>
+	    		<td>37</td>
+	    		<td>新奥尔良鹈鹕队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">6</td>
+	    		<td>约翰-沃尔</td>
+	    		<td>37.1</td>
+	    		<td>35</td>
+	    		<td>华盛顿奇才队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">7</td>
+	    		<td>里基-卢比奥</td>
+	    		<td>35.8</td>
+	    		<td>34</td>
+	    		<td>明尼苏达森林狼队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">8</td>
+	    		<td>达米安-利拉德</td>
+	    		<td>33.3</td>
+	    		<td>33</td>
+	    		<td>波特兰开拓者队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">9</td>
+	    		<td>鲁迪-戈波特</td>
+	    		<td>33.2</td>
+	    		<td>35</td>
+	    		<td>犹他爵士队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">10</td>
+	    		<td>德安德鲁-乔丹</td>
+	    		<td>32.9</td>
+	    		<td>34</td>
+	    		<td>洛杉矶快船队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">11</td>
+	    		<td>戈兰-德拉季奇</td>
+	    		<td>32.9</td>
+	    		<td>34</td>
+	    		<td>迈阿密热火队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">12</td>
+	    		<td>TJ-沃伦</td>
+	    		<td>32.1</td>
+	    		<td>44</td>
+	    		<td>菲尼克斯太阳队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">13</td>
+	    		<td>迈克-康利</td>
+	    		<td>31.1</td>
+	    		<td>33</td>
+	    		<td>孟菲斯灰熊队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">14</td>
+	    		<td>保罗-乔治</td>
+	    		<td>30.9</td>
+	    		<td>33</td>
+	    		<td>印第安纳步行者队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">15</td>
+	    		<td>泰勒-尤利斯</td>
+	    		<td>30.8</td>
+	    		<td>47</td>
+	    		<td>菲尼克斯太阳队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">16</td>
+	    		<td>艾尔-霍福德</td>
+	    		<td>30.6</td>
+	    		<td>30</td>
+	    		<td>波士顿凯尔特人队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">17</td>
+	    		<td>吉米-巴特勒</td>
+	    		<td>30.3</td>
+	    		<td>38</td>
+	    		<td>芝加哥公牛队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">18</td>
+	    		<td>尼科拉-约季奇</td>
+	    		<td>30.0</td>
+	    		<td>23</td>
+	    		<td>丹佛掘金队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">19</td>
+	    		<td>哈桑-怀特塞德</td>
+	    		<td>29.7</td>
+	    		<td>31</td>
+	    		<td>迈阿密热火队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">20</td>
+	    		<td>马克-加索尔</td>
+	    		<td>29.7</td>
+	    		<td>39</td>
+	    		<td>孟菲斯灰熊队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">21</td>
+	    		<td>凯里-欧文</td>
+	    		<td>29.2</td>
+	    		<td>31</td>
+	    		<td>克里夫兰骑士队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">22</td>
+	    		<td>斯蒂芬-库里</td>
+	    		<td>29.2</td>
+	    		<td>28</td>
+	    		<td>金州勇士队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">23</td>
+	    		<td>科怀-伦纳德</td>
+	    		<td>29.2</td>
+	    		<td>30</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">24</td>
+	    		<td>梅森-普拉姆利</td>
+	    		<td>28.5</td>
+	    		<td>30</td>
+	    		<td>丹佛掘金队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">25</td>
+	    		<td>克里斯-保罗</td>
+	    		<td>28.4</td>
+	    		<td>31</td>
+	    		<td>洛杉矶快船队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">26</td>
+	    		<td>扬尼斯-阿德托昆博</td>
+	    		<td>28.0</td>
+	    		<td>29</td>
+	    		<td>密尔沃基雄鹿队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">27</td>
+	    		<td>布拉德-比尔</td>
+	    		<td>27.9</td>
+	    		<td>33</td>
+	    		<td>华盛顿奇才队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">28</td>
+	    		<td>克莱-汤普森</td>
+	    		<td>27.9</td>
+	    		<td>34</td>
+	    		<td>金州勇士队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">29</td>
+	    		<td>埃尔弗里德-佩顿</td>
+	    		<td>27.8</td>
+	    		<td>26</td>
+	    		<td>奥兰多魔术队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">30</td>
+	    		<td>加里-哈里斯</td>
+	    		<td>27.4</td>
+	    		<td>39</td>
+	    		<td>丹佛掘金队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">31</td>
+	    		<td>尤素夫-努尔基奇</td>
+	    		<td>27.3</td>
+	    		<td>30</td>
+	    		<td>波特兰开拓者队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">32</td>
+	    		<td>德怀特-霍华德</td>
+	    		<td>26.7</td>
+	    		<td>34</td>
+	    		<td>亚特兰大老鹰队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">33</td>
+	    		<td>德雷蒙德-格林 </td>
+	    		<td>26.6</td>
+	    		<td>29</td>
+	    		<td>金州勇士队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">34</td>
+	    		<td>朱利叶斯-兰德尔</td>
+	    		<td>26.5</td>
+	    		<td>32</td>
+	    		<td>洛杉矶湖人队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">35</td>
+	    		<td>乔丹-克拉克森</td>
+	    		<td>26.5</td>
+	    		<td>40</td>
+	    		<td>洛杉矶湖人队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">36</td>
+	    		<td>以赛亚-托马斯</td>
+	    		<td>26.3</td>
+	    		<td>27</td>
+	    		<td>波士顿凯尔特人队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">37</td>
+	    		<td>马尔科姆-布罗格登</td>
+	    		<td>26.1</td>
+	    		<td>41</td>
+	    		<td>密尔沃基雄鹿队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">38</td>
+	    		<td>布鲁克-洛佩斯</td>
+	    		<td>26.0</td>
+	    		<td>31</td>
+	    		<td>布鲁克林篮网队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">39</td>
+	    		<td>安德烈-德拉蒙德</td>
+	    		<td>26.0</td>
+	    		<td>28</td>
+	    		<td>底特律活塞队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">40</td>
+	    		<td>乔治-希尔</td>
+	    		<td>25.8</td>
+	    		<td>40</td>
+	    		<td>犹他爵士队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">41</td>
+	    		<td>奥托-波特</td>
+	    		<td>25.6</td>
+	    		<td>38</td>
+	    		<td>华盛顿奇才队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">42</td>
+	    		<td>肯巴-沃克</td>
+	    		<td>25.5</td>
+	    		<td>33</td>
+	    		<td>夏洛特黄蜂队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">43</td>
+	    		<td>丹尼斯-施罗德</td>
+	    		<td>25.2</td>
+	    		<td>30</td>
+	    		<td>亚特兰大老鹰队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">44</td>
+	    		<td>达里奥-萨里奇</td>
+	    		<td>25.2</td>
+	    		<td>29</td>
+	    		<td>费城76人队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">45</td>
+	    		<td>朱-霍勒迪</td>
+	    		<td>24.9</td>
+	    		<td>33</td>
+	    		<td>新奥尔良鹈鹕队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">46</td>
+	    		<td>布雷克-格里芬</td>
+	    		<td>24.9</td>
+	    		<td>33</td>
+	    		<td>洛杉矶快船队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">47</td>
+	    		<td>凯尔-奥奎因</td>
+	    		<td>24.8</td>
+	    		<td>21</td>
+	    		<td>纽约尼克斯队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">48</td>
+	    		<td>戈登-海沃德</td>
+	    		<td>24.4</td>
+	    		<td>34</td>
+	    		<td>犹他爵士队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">49</td>
+	    		<td>理查恩-福尔摩斯</td>
+	    		<td>24.4</td>
+	    		<td>24</td>
+	    		<td>费城76人队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">50</td>
+	    		<td>尼古拉斯-巴通姆</td>
+	    		<td>24.4</td>
+	    		<td>30</td>
+	    		<td>夏洛特黄蜂队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">51</td>
+	    		<td>马文-威廉姆斯</td>
+	    		<td>24.2</td>
+	    		<td>33</td>
+	    		<td>夏洛特黄蜂队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">52</td>
+	    		<td>维克多-奥拉迪波</td>
+	    		<td>24.1</td>
+	    		<td>32</td>
+	    		<td>俄克拉荷马雷霆队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">53</td>
+	    		<td>詹姆斯-约翰逊</td>
+	    		<td>24.0</td>
+	    		<td>28</td>
+	    		<td>迈阿密热火队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">54</td>
+	    		<td>德克-诺维茨基</td>
+	    		<td>23.7</td>
+	    		<td>26</td>
+	    		<td>达拉斯小牛队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">55</td>
+	    		<td>C.J.迈克鲁姆</td>
+	    		<td>23.6</td>
+	    		<td>33</td>
+	    		<td>波特兰开拓者队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">56</td>
+	    		<td>拉简-朗多</td>
+	    		<td>22.9</td>
+	    		<td>30</td>
+	    		<td>芝加哥公牛队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">57</td>
+	    		<td>威尔-巴顿</td>
+	    		<td>22.6</td>
+	    		<td>33</td>
+	    		<td>丹佛掘金队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">58</td>
+	    		<td>伊维察-祖巴茨</td>
+	    		<td>22.5</td>
+	    		<td>22</td>
+	    		<td>洛杉矶湖人队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">59</td>
+	    		<td>贾米尔-尼尔森</td>
+	    		<td>22.5</td>
+	    		<td>37</td>
+	    		<td>丹佛掘金队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">60</td>
+	    		<td>德安吉洛-拉塞尔</td>
+	    		<td>22.4</td>
+	    		<td>29</td>
+	    		<td>洛杉矶湖人队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">61</td>
+	    		<td>斯卡尔-拉比西埃</td>
+	    		<td>22.3</td>
+	    		<td>24</td>
+	    		<td>萨克拉门托国王队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">62</td>
+	    		<td>所罗门-希尔</td>
+	    		<td>22.2</td>
+	    		<td>39</td>
+	    		<td>新奥尔良鹈鹕队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">63</td>
+	    		<td>保罗-米尔萨普</td>
+	    		<td>22.1</td>
+	    		<td>32</td>
+	    		<td>亚特兰大老鹰队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">64</td>
+	    		<td>卡梅罗-安东尼</td>
+	    		<td>21.9</td>
+	    		<td>37</td>
+	    		<td>纽约尼克斯队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">65</td>
+	    		<td>托比亚斯-哈里斯</td>
+	    		<td>21.8</td>
+	    		<td>33</td>
+	    		<td>底特律活塞队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">66</td>
+	    		<td>乔治斯-帕帕扬尼斯</td>
+	    		<td>21.8</td>
+	    		<td>30</td>
+	    		<td>萨克拉门托国王队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">67</td>
+	    		<td>陶林-普林斯</td>
+	    		<td>21.8</td>
+	    		<td>32</td>
+	    		<td>亚特兰大老鹰队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">68</td>
+	    		<td>乔-英格尔斯</td>
+	    		<td>21.7</td>
+	    		<td>34</td>
+	    		<td>犹他爵士队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">69</td>
+	    		<td>克里斯-米德尔顿</td>
+	    		<td>21.5</td>
+	    		<td>31</td>
+	    		<td>密尔沃基雄鹿队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">70</td>
+	    		<td>罗波特-考文顿</td>
+	    		<td>21.5</td>
+	    		<td>30</td>
+	    		<td>费城76人队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">71</td>
+	    		<td>阿兰-威廉姆斯</td>
+	    		<td>21.4</td>
+	    		<td>24</td>
+	    		<td>菲尼克斯太阳队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">72</td>
+	    		<td>帕特里克-米尔斯</td>
+	    		<td>21.2</td>
+	    		<td>26</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">73</td>
+	    		<td>德里克-罗斯</td>
+	    		<td>21.1</td>
+	    		<td>34</td>
+	    		<td>纽约尼克斯队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">74</td>
+	    		<td>伊恩-克拉克</td>
+	    		<td>21.1</td>
+	    		<td>23</td>
+	    		<td>金州勇士队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">75</td>
+	    		<td>保罗-加索尔</td>
+	    		<td>21.0</td>
+	    		<td>23</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">76</td>
+	    		<td>何塞-巴里亚</td>
+	    		<td>20.9</td>
+	    		<td>25</td>
+	    		<td>达拉斯小牛队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">77</td>
+	    		<td>马基斯-克里斯</td>
+	    		<td>20.9</td>
+	    		<td>27</td>
+	    		<td>菲尼克斯太阳队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">78</td>
+	    		<td>艾弗里-布拉德利</td>
+	    		<td>20.8</td>
+	    		<td>35</td>
+	    		<td>波士顿凯尔特人队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">79</td>
+	    		<td>克里斯塔普斯-波尔津吉斯</td>
+	    		<td>20.7</td>
+	    		<td>28</td>
+	    		<td>纽约尼克斯队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">80</td>
+	    		<td>布兰顿-英格拉姆</td>
+	    		<td>20.5</td>
+	    		<td>37</td>
+	    		<td>洛杉矶湖人队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">81</td>
+	    		<td>史蒂文-亚当斯</td>
+	    		<td>20.5</td>
+	    		<td>31</td>
+	    		<td>俄克拉荷马雷霆队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">82</td>
+	    		<td>蒂姆-哈达威二世</td>
+	    		<td>20.5</td>
+	    		<td>27</td>
+	    		<td>亚特兰大老鹰队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">83</td>
+	    		<td>德文-布克</td>
+	    		<td>20.4</td>
+	    		<td>34</td>
+	    		<td>菲尼克斯太阳队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">84</td>
+	    		<td>德玛尔-德罗赞</td>
+	    		<td>20.4</td>
+	    		<td>28</td>
+	    		<td>多伦多猛龙队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">85</td>
+	    		<td>威利-考利-斯坦恩</td>
+	    		<td>20.3</td>
+	    		<td>32</td>
+	    		<td>萨克拉门托国王队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">86</td>
+	    		<td>马基夫-莫里斯</td>
+	    		<td>20.1</td>
+	    		<td>38</td>
+	    		<td>华盛顿奇才队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">87</td>
+	    		<td>路易斯-威廉姆斯</td>
+	    		<td>20.1</td>
+	    		<td>29</td>
+	    		<td>休斯顿火箭队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">88</td>
+	    		<td>吉列尔莫-埃尔南戈麦斯</td>
+	    		<td>19.8</td>
+	    		<td>23</td>
+	    		<td>纽约尼克斯队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">89</td>
+	    		<td>胡安-埃尔南戈麦斯</td>
+	    		<td>19.6</td>
+	    		<td>26</td>
+	    		<td>丹佛掘金队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">90</td>
+	    		<td>杰夫-蒂格</td>
+	    		<td>19.6</td>
+	    		<td>30</td>
+	    		<td>印第安纳步行者队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">91</td>
+	    		<td>诺阿-冯莱</td>
+	    		<td>19.4</td>
+	    		<td>30</td>
+	    		<td>波特兰开拓者队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">92</td>
+	    		<td>迈尔斯-特纳</td>
+	    		<td>19.4</td>
+	    		<td>32</td>
+	    		<td>印第安纳步行者队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">93</td>
+	    		<td>迈克尔-吉尔克里斯特</td>
+	    		<td>19.3</td>
+	    		<td>29</td>
+	    		<td>夏洛特黄蜂队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">94</td>
+	    		<td>安德烈-伊格达拉</td>
+	    		<td>19.3</td>
+	    		<td>26</td>
+	    		<td>金州勇士队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">95</td>
+	    		<td>科里-约瑟夫</td>
+	    		<td>19.3</td>
+	    		<td>31</td>
+	    		<td>多伦多猛龙队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">96</td>
+	    		<td>巴迪-希尔德</td>
+	    		<td>19.3</td>
+	    		<td>32</td>
+	    		<td>萨克拉门托国王队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">97</td>
+	    		<td>泰勒-约翰逊</td>
+	    		<td>19.2</td>
+	    		<td>33</td>
+	    		<td>迈阿密热火队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">98</td>
+	    		<td>埃文-富尼耶</td>
+	    		<td>19.0</td>
+	    		<td>28</td>
+	    		<td>奥兰多魔术队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">99</td>
+	    		<td>朗戴-霍利斯-杰弗森</td>
+	    		<td>18.8</td>
+	    		<td>25</td>
+	    		<td>布鲁克林篮网队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">100</td>
+	    		<td>德马库斯-考辛斯</td>
+	    		<td>18.5</td>
+	    		<td>26</td>
+	    		<td>新奥尔良鹈鹕队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">101</td>
+	    		<td>贾马尔-穆雷</td>
+	    		<td>18.4</td>
+	    		<td>26</td>
+	    		<td>丹佛掘金队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">102</td>
+	    		<td>T.J. 麦康诺</td>
+	    		<td>18.4</td>
+	    		<td>27</td>
+	    		<td>费城76人队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">103</td>
+	    		<td>科迪-泽勒</td>
+	    		<td>18.4</td>
+	    		<td>30</td>
+	    		<td>夏洛特黄蜂队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">104</td>
+	    		<td>J.J.雷迪克</td>
+	    		<td>18.4</td>
+	    		<td>27</td>
+	    		<td>洛杉矶快船队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">105</td>
+	    		<td>兰斯-托马斯</td>
+	    		<td>18.4</td>
+	    		<td>35</td>
+	    		<td>纽约尼克斯队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">106</td>
+	    		<td>阿隆-戈登</td>
+	    		<td>18.4</td>
+	    		<td>28</td>
+	    		<td>奥兰多魔术队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">107</td>
+	    		<td>艾利克斯-伦</td>
+	    		<td>18.3</td>
+	    		<td>23</td>
+	    		<td>菲尼克斯太阳队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">108</td>
+	    		<td>马特-巴恩斯</td>
+	    		<td>18.3</td>
+	    		<td>26</td>
+	    		<td>金州勇士队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">109</td>
+	    		<td>安德鲁-威金斯</td>
+	    		<td>18.1</td>
+	    		<td>39</td>
+	    		<td>明尼苏达森林狼队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">110</td>
+	    		<td>杰森-史密斯</td>
+	    		<td>17.9</td>
+	    		<td>24</td>
+	    		<td>华盛顿奇才队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">111</td>
+	    		<td>马库斯-斯玛特</td>
+	    		<td>17.9</td>
+	    		<td>30</td>
+	    		<td>波士顿凯尔特人队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">112</td>
+	    		<td>内内-希拉里奥</td>
+	    		<td>17.8</td>
+	    		<td>21</td>
+	    		<td>休斯顿火箭队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">113</td>
+	    		<td>赛迪斯-杨</td>
+	    		<td>17.7</td>
+	    		<td>35</td>
+	    		<td>印第安纳步行者队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">114</td>
+	    		<td>达伦-科里森</td>
+	    		<td>17.7</td>
+	    		<td>27</td>
+	    		<td>萨克拉门托国王队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">115</td>
+	    		<td>托尼-阿伦</td>
+	    		<td>17.7</td>
+	    		<td>32</td>
+	    		<td>孟菲斯灰熊队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">116</td>
+	    		<td>罗宾-洛佩斯</td>
+	    		<td>17.6</td>
+	    		<td>27</td>
+	    		<td>芝加哥公牛队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">117</td>
+	    		<td>特雷沃-阿里扎</td>
+	    		<td>17.4</td>
+	    		<td>30</td>
+	    		<td>休斯顿火箭队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">118</td>
+	    		<td>丹泽尔-瓦伦蒂内</td>
+	    		<td>17.3</td>
+	    		<td>32</td>
+	    		<td>芝加哥公牛队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">119</td>
+	    		<td>克林特-卡佩拉</td>
+	    		<td>17.3</td>
+	    		<td>19</td>
+	    		<td>休斯顿火箭队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">120</td>
+	    		<td>埃内斯-坎特</td>
+	    		<td>17.3</td>
+	    		<td>17</td>
+	    		<td>俄克拉荷马雷霆队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">121</td>
+	    		<td>兰迪-弗耶</td>
+	    		<td>17.3</td>
+	    		<td>31</td>
+	    		<td>布鲁克林篮网队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">122</td>
+	    		<td>戈尔吉-吉昂</td>
+	    		<td>17.1</td>
+	    		<td>30</td>
+	    		<td>明尼苏达森林狼队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">123</td>
+	    		<td>文斯-卡特</td>
+	    		<td>17.1</td>
+	    		<td>32</td>
+	    		<td>孟菲斯灰熊队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">124</td>
+	    		<td>拉玛库斯-阿尔德里奇</td>
+	    		<td>17.1</td>
+	    		<td>23</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">125</td>
+	    		<td>托尼-斯内尔</td>
+	    		<td>16.7</td>
+	    		<td>28</td>
+	    		<td>密尔沃基雄鹿队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">126</td>
+	    		<td>杰-克劳德</td>
+	    		<td>16.6</td>
+	    		<td>32</td>
+	    		<td>波士顿凯尔特人队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">127</td>
+	    		<td>雷吉-杰克逊</td>
+	    		<td>16.6</td>
+	    		<td>22</td>
+	    		<td>底特律活塞队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">128</td>
+	    		<td>扎克-兰多夫</td>
+	    		<td>16.6</td>
+	    		<td>24</td>
+	    		<td>孟菲斯灰熊队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">129</td>
+	    		<td>伊托万-摩尔</td>
+	    		<td>16.5</td>
+	    		<td>32</td>
+	    		<td>新奥尔良鹈鹕队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">130</td>
+	    		<td>阿隆-贝恩斯</td>
+	    		<td>16.4</td>
+	    		<td>18</td>
+	    		<td>底特律活塞队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">131</td>
+	    		<td>蒂莫西-鲁瓦乌</td>
+	    		<td>16.4</td>
+	    		<td>32</td>
+	    		<td>费城76人队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">132</td>
+	    		<td>杰迈克尔-格林</td>
+	    		<td>16.4</td>
+	    		<td>24</td>
+	    		<td>孟菲斯灰熊队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">133</td>
+	    		<td>哈里森-巴恩斯</td>
+	    		<td>16.4</td>
+	    		<td>32</td>
+	    		<td>达拉斯小牛队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">134</td>
+	    		<td>特里斯坦-汤普森</td>
+	    		<td>16.4</td>
+	    		<td>26</td>
+	    		<td>克里夫兰骑士队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">135</td>
+	    		<td>阿伦-克拉布</td>
+	    		<td>16.3</td>
+	    		<td>31</td>
+	    		<td>波特兰开拓者队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">136</td>
+	    		<td>肯特-贝兹莫尔</td>
+	    		<td>16.3</td>
+	    		<td>32</td>
+	    		<td>亚特兰大老鹰队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">137</td>
+	    		<td>安德烈-罗伯森</td>
+	    		<td>16.2</td>
+	    		<td>28</td>
+	    		<td>俄克拉荷马雷霆队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">138</td>
+	    		<td>尼古拉-米罗蒂奇</td>
+	    		<td>16.2</td>
+	    		<td>25</td>
+	    		<td>芝加哥公牛队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">139</td>
+	    		<td>乔丹-克劳福德</td>
+	    		<td>16.2</td>
+	    		<td>19</td>
+	    		<td>新奥尔良鹈鹕队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">140</td>
+	    		<td>约纳斯-瓦兰丘纳斯</td>
+	    		<td>16.1</td>
+	    		<td>18</td>
+	    		<td>多伦多猛龙队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">141</td>
+	    		<td>加内特-坦普尔</td>
+	    		<td>16.1</td>
+	    		<td>28</td>
+	    		<td>萨克拉门托国王队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">142</td>
+	    		<td>杰里米-兰姆</td>
+	    		<td>15.7</td>
+	    		<td>21</td>
+	    		<td>夏洛特黄蜂队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">143</td>
+	    		<td>昆西-阿希</td>
+	    		<td>15.6</td>
+	    		<td>26</td>
+	    		<td>布鲁克林篮网队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">144</td>
+	    		<td>卡里斯-勒夫特</td>
+	    		<td>15.5</td>
+	    		<td>24</td>
+	    		<td>布鲁克林篮网队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">145</td>
+	    		<td>迪昂-维特斯</td>
+	    		<td>15.3</td>
+	    		<td>18</td>
+	    		<td>迈阿密热火队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">146</td>
+	    		<td>艾森-伊利亚索瓦</td>
+	    		<td>15.3</td>
+	    		<td>19</td>
+	    		<td>亚特兰大老鹰队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">147</td>
+	    		<td>乔-约翰逊</td>
+	    		<td>15.3</td>
+	    		<td>31</td>
+	    		<td>犹他爵士队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">148</td>
+	    		<td>格雷格-门罗</td>
+	    		<td>15.1</td>
+	    		<td>18</td>
+	    		<td>密尔沃基雄鹿队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">149</td>
+	    		<td>伊安-马辛米</td>
+	    		<td>15.1</td>
+	    		<td>19</td>
+	    		<td>华盛顿奇才队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">150</td>
+	    		<td>伊斯梅尔-史密斯</td>
+	    		<td>15.0</td>
+	    		<td>23</td>
+	    		<td>底特律活塞队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">151</td>
+	    		<td>沙巴兹-穆罕默德</td>
+	    		<td>14.7</td>
+	    		<td>25</td>
+	    		<td>明尼苏达森林狼队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">152</td>
+	    		<td>考特尼-李</td>
+	    		<td>14.7</td>
+	    		<td>31</td>
+	    		<td>纽约尼克斯队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">153</td>
+	    		<td>埃里克-戈登</td>
+	    		<td>14.6</td>
+	    		<td>29</td>
+	    		<td>休斯顿火箭队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">154</td>
+	    		<td>斯宾瑟-丁维迪</td>
+	    		<td>14.3</td>
+	    		<td>28</td>
+	    		<td>布鲁克林篮网队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">155</td>
+	    		<td>林书豪</td>
+	    		<td>14.2</td>
+	    		<td>16</td>
+	    		<td>布鲁克林篮网队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">156</td>
+	    		<td>蒂姆-弗雷泽</td>
+	    		<td>14.2</td>
+	    		<td>20</td>
+	    		<td>新奥尔良鹈鹕队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">157</td>
+	    		<td>蒙塔-艾利斯</td>
+	    		<td>14.2</td>
+	    		<td>25</td>
+	    		<td>印第安纳步行者队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">158</td>
+	    		<td>阿米尔-约翰逊</td>
+	    		<td>14.1</td>
+	    		<td>24</td>
+	    		<td>波士顿凯尔特人队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">159</td>
+	    		<td>马尔钦-戈塔特</td>
+	    		<td>13.9</td>
+	    		<td>25</td>
+	    		<td>华盛顿奇才队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">160</td>
+	    		<td>雅各布-珀尔特尔</td>
+	    		<td>13.7</td>
+	    		<td>21</td>
+	    		<td>多伦多猛龙队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">161</td>
+	    		<td>约什-理查德森</td>
+	    		<td>13.7</td>
+	    		<td>29</td>
+	    		<td>迈阿密热火队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">162</td>
+	    		<td>赛尔吉-伊巴卡</td>
+	    		<td>13.7</td>
+	    		<td>27</td>
+	    		<td>多伦多猛龙队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">163</td>
+	    		<td>迈克尔-卡特-威廉姆斯</td>
+	    		<td>13.7</td>
+	    		<td>23</td>
+	    		<td>芝加哥公牛队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">164</td>
+	    		<td>赛尔吉奥-罗德里格斯</td>
+	    		<td>13.6</td>
+	    		<td>20</td>
+	    		<td>费城76人队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">165</td>
+	    		<td>丹特-康宁汉姆</td>
+	    		<td>13.6</td>
+	    		<td>28</td>
+	    		<td>新奥尔良鹈鹕队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">166</td>
+	    		<td>布兰登-拉什</td>
+	    		<td>13.5</td>
+	    		<td>41</td>
+	    		<td>明尼苏达森林狼队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">167</td>
+	    		<td>博扬-博格达诺维奇</td>
+	    		<td>13.4</td>
+	    		<td>22</td>
+	    		<td>华盛顿奇才队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">168</td>
+	    		<td>马科-贝里内利</td>
+	    		<td>13.3</td>
+	    		<td>28</td>
+	    		<td>夏洛特黄蜂队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">169</td>
+	    		<td>马努-吉诺比利</td>
+	    		<td>13.3</td>
+	    		<td>17</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">170</td>
+	    		<td>肯塔维奥斯-卡德维尔-波普</td>
+	    		<td>13.3</td>
+	    		<td>31</td>
+	    		<td>底特律活塞队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">171</td>
+	    		<td>扎扎-帕楚里亚</td>
+	    		<td>13.2</td>
+	    		<td>15</td>
+	    		<td>金州勇士队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">172</td>
+	    		<td>贾斯汀-安德森</td>
+	    		<td>13.2</td>
+	    		<td>18</td>
+	    		<td>费城76人队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">173</td>
+	    		<td>特雷沃-布克</td>
+	    		<td>13.2</td>
+	    		<td>19</td>
+	    		<td>布鲁克林篮网队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">174</td>
+	    		<td>帕特里克-贝弗利</td>
+	    		<td>13.1</td>
+	    		<td>29</td>
+	    		<td>休斯顿火箭队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">175</td>
+	    		<td>德隆-威廉姆斯</td>
+	    		<td>13.0</td>
+	    		<td>22</td>
+	    		<td>克里夫兰骑士队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">176</td>
+	    		<td>大卫-李</td>
+	    		<td>13.0</td>
+	    		<td>15</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">177</td>
+	    		<td>乔恩-洛伊尔</td>
+	    		<td>12.9</td>
+	    		<td>25</td>
+	    		<td>底特律活塞队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">178</td>
+	    		<td>科斯塔-库佛斯</td>
+	    		<td>12.6</td>
+	    		<td>17</td>
+	    		<td>萨克拉门托国王队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">179</td>
+	    		<td>泰-劳森</td>
+	    		<td>12.5</td>
+	    		<td>19</td>
+	    		<td>萨克拉门托国王队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">180</td>
+	    		<td>贾马尔-克劳福德</td>
+	    		<td>12.5</td>
+	    		<td>26</td>
+	    		<td>洛杉矶快船队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">181</td>
+	    		<td>韦恩-艾灵顿</td>
+	    		<td>12.5</td>
+	    		<td>18</td>
+	    		<td>迈阿密热火队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">182</td>
+	    		<td>马库斯-莫里斯</td>
+	    		<td>12.5</td>
+	    		<td>34</td>
+	    		<td>底特律活塞队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">183</td>
+	    		<td>钱宁-弗莱</td>
+	    		<td>12.3</td>
+	    		<td>20</td>
+	    		<td>克里夫兰骑士队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">184</td>
+	    		<td>K.J. 麦克丹尼尔斯</td>
+	    		<td>12.3</td>
+	    		<td>20</td>
+	    		<td>布鲁克林篮网队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">185</td>
+	    		<td>阿莱克斯-阿布林斯</td>
+	    		<td>12.1</td>
+	    		<td>19</td>
+	    		<td>俄克拉荷马雷霆队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">186</td>
+	    		<td>德隆-莱特</td>
+	    		<td>12.0</td>
+	    		<td>19</td>
+	    		<td>多伦多猛龙队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">187</td>
+	    		<td>约吉-费雷尔</td>
+	    		<td>12.0</td>
+	    		<td>20</td>
+	    		<td>达拉斯小牛队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">188</td>
+	    		<td>马修-德拉维多瓦</td>
+	    		<td>12.0</td>
+	    		<td>26</td>
+	    		<td>密尔沃基雄鹿队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">189</td>
+	    		<td>理查德-杰弗森</td>
+	    		<td>11.9</td>
+	    		<td>27</td>
+	    		<td>克里夫兰骑士队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">190</td>
+	    		<td>兰斯顿-加洛韦</td>
+	    		<td>11.8</td>
+	    		<td>31</td>
+	    		<td>萨克拉门托国王队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">191</td>
+	    		<td>韦斯利-马修斯</td>
+	    		<td>11.8</td>
+	    		<td>29</td>
+	    		<td>达拉斯小牛队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">192</td>
+	    		<td>伊塞亚-怀特海德</td>
+	    		<td>11.7</td>
+	    		<td>24</td>
+	    		<td>布鲁克林篮网队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">193</td>
+	    		<td>鲍比-波蒂斯</td>
+	    		<td>11.7</td>
+	    		<td>22</td>
+	    		<td>芝加哥公牛队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">194</td>
+	    		<td>阿隆-阿弗拉罗</td>
+	    		<td>11.6</td>
+	    		<td>31</td>
+	    		<td>萨克拉门托国王队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">195</td>
+	    		<td>拉里-南斯 Jr.</td>
+	    		<td>11.6</td>
+	    		<td>15</td>
+	    		<td>洛杉矶湖人队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">196</td>
+	    		<td>德维恩-戴德蒙</td>
+	    		<td>11.6</td>
+	    		<td>20</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">197</td>
+	    		<td>塞斯-库里</td>
+	    		<td>11.5</td>
+	    		<td>25</td>
+	    		<td>达拉斯小牛队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">198</td>
+	    		<td>德文-哈里斯</td>
+	    		<td>11.3</td>
+	    		<td>17</td>
+	    		<td>达拉斯小牛队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">199</td>
+	    		<td>凯利-奥利尼克</td>
+	    		<td>11.2</td>
+	    		<td>13</td>
+	    		<td>波士顿凯尔特人队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">200</td>
+	    		<td>莱恩-安德森</td>
+	    		<td>11.2</td>
+	    		<td>25</td>
+	    		<td>休斯顿火箭队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">201</td>
+	    		<td>奥斯汀-里弗斯</td>
+	    		<td>11.2</td>
+	    		<td>24</td>
+	    		<td>洛杉矶快船队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">202</td>
+	    		<td>莫里斯-哈克利斯</td>
+	    		<td>11.1</td>
+	    		<td>22</td>
+	    		<td>波特兰开拓者队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">203</td>
+	    		<td>威利-里德</td>
+	    		<td>11.0</td>
+	    		<td>15</td>
+	    		<td>迈阿密热火队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">204</td>
+	    		<td>贾希尔-奥卡福</td>
+	    		<td>11.0</td>
+	    		<td>13</td>
+	    		<td>费城76人队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">205</td>
+	    		<td>亚历克-伯克斯</td>
+	    		<td>11.0</td>
+	    		<td>18</td>
+	    		<td>犹他爵士队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">206</td>
+	    		<td>内曼加-别利卡</td>
+	    		<td>11.0</td>
+	    		<td>18</td>
+	    		<td>明尼苏达森林狼队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">207</td>
+	    		<td>泰-吉布森</td>
+	    		<td>11.0</td>
+	    		<td>19</td>
+	    		<td>俄克拉荷马雷霆队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">208</td>
+	    		<td>C.J.沃特森</td>
+	    		<td>10.8</td>
+	    		<td>18</td>
+	    		<td>奥兰多魔术队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">209</td>
+	    		<td>贾斯汀-霍勒迪</td>
+	    		<td>10.8</td>
+	    		<td>19</td>
+	    		<td>纽约尼克斯队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">210</td>
+	    		<td>特里-罗齐尔</td>
+	    		<td>10.8</td>
+	    		<td>23</td>
+	    		<td>波士顿凯尔特人队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">211</td>
+	    		<td>德怀特-鲍威尔</td>
+	    		<td>10.7</td>
+	    		<td>17</td>
+	    		<td>达拉斯小牛队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">212</td>
+	    		<td>布兰登-詹宁斯</td>
+	    		<td>10.5</td>
+	    		<td>18</td>
+	    		<td>华盛顿奇才队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">213</td>
+	    		<td>安东尼-托利弗</td>
+	    		<td>10.5</td>
+	    		<td>18</td>
+	    		<td>萨克拉门托国王队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">214</td>
+	    		<td>诺曼-鲍威尔</td>
+	    		<td>10.5</td>
+	    		<td>18</td>
+	    		<td>多伦多猛龙队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">215</td>
+	    		<td>伊曼-香珀特</td>
+	    		<td>10.5</td>
+	    		<td>26</td>
+	    		<td>克里夫兰骑士队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">216</td>
+	    		<td>丹特-埃萨姆</td>
+	    		<td>10.4</td>
+	    		<td>17</td>
+	    		<td>犹他爵士队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">217</td>
+	    		<td>米尔扎-泰利托维奇</td>
+	    		<td>10.4</td>
+	    		<td>23</td>
+	    		<td>密尔沃基雄鹿队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">218</td>
+	    		<td>J.R.史密斯</td>
+	    		<td>10.2</td>
+	    		<td>30</td>
+	    		<td>克里夫兰骑士队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">219</td>
+	    		<td>科里-布鲁尔</td>
+	    		<td>10.2</td>
+	    		<td>17</td>
+	    		<td>洛杉矶湖人队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">220</td>
+	    		<td>大卫-恩瓦巴</td>
+	    		<td>10.1</td>
+	    		<td>21</td>
+	    		<td>洛杉矶湖人队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">221</td>
+	    		<td>道格-迈克德莫特</td>
+	    		<td>10.0</td>
+	    		<td>17</td>
+	    		<td>俄克拉荷马雷霆队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">222</td>
+	    		<td>尼克-施陶斯卡斯</td>
+	    		<td>10.0</td>
+	    		<td>27</td>
+	    		<td>费城76人队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">223</td>
+	    		<td>乔纳森-西蒙斯</td>
+	    		<td>10.0</td>
+	    		<td>16</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">224</td>
+	    		<td>马利斯-斯贝茨</td>
+	    		<td>9.9</td>
+	    		<td>12</td>
+	    		<td>洛杉矶快船队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">225</td>
+	    		<td>丹尼-格林</td>
+	    		<td>9.9</td>
+	    		<td>22</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">226</td>
+	    		<td>贾莱德-杜德利</td>
+	    		<td>9.7</td>
+	    		<td>27</td>
+	    		<td>菲尼克斯太阳队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">227</td>
+	    		<td>杰夫-格林</td>
+	    		<td>9.7</td>
+	    		<td>15</td>
+	    		<td>奥兰多魔术队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">228</td>
+	    		<td>罗恩-贝克</td>
+	    		<td>9.5</td>
+	    		<td>24</td>
+	    		<td>纽约尼克斯队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">229</td>
+	    		<td>多曼塔斯-萨博尼斯</td>
+	    		<td>9.5</td>
+	    		<td>23</td>
+	    		<td>俄克拉荷马雷霆队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">230</td>
+	    		<td>拉基姆·克里斯马斯</td>
+	    		<td>9.3</td>
+	    		<td>18</td>
+	    		<td>印第安纳步行者队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">231</td>
+	    		<td>德安德鲁-利金斯</td>
+	    		<td>9.2</td>
+	    		<td>15</td>
+	    		<td>克里夫兰骑士队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">232</td>
+	    		<td>艾尔-法鲁克-阿米奴</td>
+	    		<td>9.0</td>
+	    		<td>23</td>
+	    		<td>波特兰开拓者队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">233</td>
+	    		<td>约翰-汉森</td>
+	    		<td>8.7</td>
+	    		<td>10</td>
+	    		<td>密尔沃基雄鹿队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">234</td>
+	    		<td>C.J. Miles</td>
+	    		<td>8.6</td>
+	    		<td>19</td>
+	    		<td>印第安纳步行者队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">235</td>
+	    		<td>DJ-奥古斯丁</td>
+	    		<td>8.4</td>
+	    		<td>18</td>
+	    		<td>奥兰多魔术队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">236</td>
+	    		<td>大卫-韦斯特</td>
+	    		<td>8.4</td>
+	    		<td>11</td>
+	    		<td>金州勇士队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">237</td>
+	    		<td>帕特里克-帕特森</td>
+	    		<td>8.3</td>
+	    		<td>16</td>
+	    		<td>多伦多猛龙队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">238</td>
+	    		<td>雷蒙德-费尔顿</td>
+	    		<td>8.3</td>
+	    		<td>16</td>
+	    		<td>洛杉矶快船队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">239</td>
+	    		<td>PJ-塔克</td>
+	    		<td>8.2</td>
+	    		<td>19</td>
+	    		<td>多伦多猛龙队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">240</td>
+	    		<td>贾维尔-麦基</td>
+	    		<td>8.2</td>
+	    		<td>8</td>
+	    		<td>金州勇士队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">241</td>
+	    		<td>德里克-威廉姆斯</td>
+	    		<td>8.0</td>
+	    		<td>22</td>
+	    		<td>克里夫兰骑士队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">242</td>
+	    		<td>泰伦斯-罗斯</td>
+	    		<td>8.0</td>
+	    		<td>26</td>
+	    		<td>奥兰多魔术队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">243</td>
+	    		<td>马里奥-赫佐尼亚</td>
+	    		<td>7.8</td>
+	    		<td>20</td>
+	    		<td>奥兰多魔术队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">244</td>
+	    		<td>兰德尼-麦格鲁德</td>
+	    		<td>7.5</td>
+	    		<td>16</td>
+	    		<td>迈阿密热火队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">245</td>
+	    		<td>克里斯蒂亚诺-费利西奥</td>
+	    		<td>7.4</td>
+	    		<td>12</td>
+	    		<td>芝加哥公牛队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">246</td>
+	    		<td>卢克-理查德-巴莫特</td>
+	    		<td>7.4</td>
+	    		<td>18</td>
+	    		<td>洛杉矶快船队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">247</td>
+	    		<td>特洛伊-丹尼尔斯</td>
+	    		<td>7.3</td>
+	    		<td>24</td>
+	    		<td>孟菲斯灰熊队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">248</td>
+	    		<td>卢克-巴比特</td>
+	    		<td>7.3</td>
+	    		<td>18</td>
+	    		<td>迈阿密热火队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">249</td>
+	    		<td>保罗-齐普泽</td>
+	    		<td>7.3</td>
+	    		<td>21</td>
+	    		<td>芝加哥公牛队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">250</td>
+	    		<td>萨波-索夫洛萨</td>
+	    		<td>7.0</td>
+	    		<td>14</td>
+	    		<td>亚特兰大老鹰队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">251</td>
+	    		<td>德里克-琼斯</td>
+	    		<td>6.7</td>
+	    		<td>18</td>
+	    		<td>菲尼克斯太阳队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">252</td>
+	    		<td>塔里克-布莱克</td>
+	    		<td>6.7</td>
+	    		<td>11</td>
+	    		<td>洛杉矶湖人队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">253</td>
+	    		<td>肖恩-基尔帕特里克</td>
+	    		<td>6.6</td>
+	    		<td>8</td>
+	    		<td>布鲁克林篮网队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">254</td>
+	    		<td>戴维斯-贝尔坦斯</td>
+	    		<td>6.5</td>
+	    		<td>10</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">255</td>
+	    		<td>伯瑞斯-迪奥</td>
+	    		<td>6.3</td>
+	    		<td>16</td>
+	    		<td>犹他爵士队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">256</td>
+	    		<td>詹姆斯-迈克尔-麦卡杜</td>
+	    		<td>6.2</td>
+	    		<td>8</td>
+	    		<td>金州勇士队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">257</td>
+	    		<td>肖恩-朗</td>
+	    		<td>6.2</td>
+	    		<td>5</td>
+	    		<td>费城76人队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">258</td>
+	    		<td>沙巴兹-内皮尔</td>
+	    		<td>6.1</td>
+	    		<td>9</td>
+	    		<td>波特兰开拓者队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">259</td>
+	    		<td>萨拉赫-梅杰里</td>
+	    		<td>6.1</td>
+	    		<td>10</td>
+	    		<td>达拉斯小牛队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">260</td>
+	    		<td>克里斯-邓恩</td>
+	    		<td>6.0</td>
+	    		<td>13</td>
+	    		<td>明尼苏达森林狼队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">261</td>
+	    		<td>约纳斯-杰雷布科</td>
+	    		<td>5.7</td>
+	    		<td>15</td>
+	    		<td>波士顿凯尔特人队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">262</td>
+	    		<td>凯利-奥伯尔</td>
+	    		<td>5.6</td>
+	    		<td>14</td>
+	    		<td>华盛顿奇才队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">263</td>
+	    		<td>格伦-罗宾逊三世</td>
+	    		<td>5.6</td>
+	    		<td>10</td>
+	    		<td>印第安纳步行者队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">264</td>
+	    		<td>布兰登-怀特</td>
+	    		<td>5.6</td>
+	    		<td>6</td>
+	    		<td>孟菲斯灰熊队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">265</td>
+	    		<td>杰伦-布朗</td>
+	    		<td>5.6</td>
+	    		<td>12</td>
+	    		<td>波士顿凯尔特人队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">266</td>
+	    		<td>萨马基-克里斯顿</td>
+	    		<td>5.5</td>
+	    		<td>17</td>
+	    		<td>俄克拉荷马雷霆队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">267</td>
+	    		<td>泰尔斯-琼斯</td>
+	    		<td>5.5</td>
+	    		<td>9</td>
+	    		<td>明尼苏达森林狼队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">268</td>
+	    		<td>安德鲁-哈里森</td>
+	    		<td>5.5</td>
+	    		<td>11</td>
+	    		<td>孟菲斯灰熊队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">269</td>
+	    		<td>多里安-芬尼-史密斯</td>
+	    		<td>5.4</td>
+	    		<td>14</td>
+	    		<td>达拉斯小牛队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">270</td>
+	    		<td>索恩-马克</td>
+	    		<td>5.4</td>
+	    		<td>9</td>
+	    		<td>密尔沃基雄鹿队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">271</td>
+	    		<td>肖恩-利文斯顿</td>
+	    		<td>5.3</td>
+	    		<td>18</td>
+	    		<td>金州勇士队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">272</td>
+	    		<td>詹姆斯-恩尼斯</td>
+	    		<td>5.3</td>
+	    		<td>17</td>
+	    		<td>孟菲斯灰熊队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">273</td>
+	    		<td>拉沙德-沃恩</td>
+	    		<td>5.1</td>
+	    		<td>11</td>
+	    		<td>密尔沃基雄鹿队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">274</td>
+	    		<td>卡梅隆-佩恩</td>
+	    		<td>5.1</td>
+	    		<td>11</td>
+	    		<td>芝加哥公牛队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">275</td>
+	    		<td>杰拉德-亨德森</td>
+	    		<td>4.7</td>
+	    		<td>12</td>
+	    		<td>费城76人队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">276</td>
+	    		<td>凯尔-安德森</td>
+	    		<td>4.3</td>
+	    		<td>6</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">277</td>
+	    		<td>莱昂德罗-巴博萨</td>
+	    		<td>4.3</td>
+	    		<td>9</td>
+	    		<td>菲尼克斯太阳队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">278</td>
+	    		<td>斯坦利-约翰逊</td>
+	    		<td>4.2</td>
+	    		<td>8</td>
+	    		<td>底特律活塞队</td>
+	    		<td id="role">SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">279</td>
+	    		<td>阿莱克西-阿金萨</td>
+	    		<td>4.1</td>
+	    		<td>5</td>
+	    		<td>新奥尔良鹈鹕队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">280</td>
+	    		<td>罗德尼-胡德</td>
+	    		<td>3.9</td>
+	    		<td>9</td>
+	    		<td>犹他爵士队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">281</td>
+	    		<td>帕特里克-麦考</td>
+	    		<td>3.9</td>
+	    		<td>14</td>
+	    		<td>金州勇士队</td>
+	    		<td id="role">SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">282</td>
+	    		<td>何塞-卡尔德隆</td>
+	    		<td>3.8</td>
+	    		<td>8</td>
+	    		<td>亚特兰大老鹰队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">283</td>
+	    		<td>罗德尼-斯塔基</td>
+	    		<td>3.6</td>
+	    		<td>14</td>
+	    		<td>印第安纳步行者队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">284</td>
+	    		<td>雷吉-巴洛克</td>
+	    		<td>3.6</td>
+	    		<td>11</td>
+	    		<td>底特律活塞队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">285</td>
+	    		<td>杰森-特里</td>
+	    		<td>3.5</td>
+	    		<td>9</td>
+	    		<td>密尔沃基雄鹿队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">286</td>
+	    		<td>俾斯麦-比永博</td>
+	    		<td>3.0</td>
+	    		<td>6</td>
+	    		<td>奥兰多魔术队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">287</td>
+	    		<td>布莱恩-罗伯茨</td>
+	    		<td>2.5</td>
+	    		<td>4</td>
+	    		<td>夏洛特黄蜂队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">288</td>
+	    		<td>乔尔-安东尼</td>
+	    		<td>2.5</td>
+	    		<td>6</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">289</td>
+	    		<td>韦斯利-约翰逊</td>
+	    		<td>2.5</td>
+	    		<td>9</td>
+	    		<td>洛杉矶快船队</td>
+	    		<td id="role">SG/SF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">290</td>
+	    		<td>梅耶斯-伦纳德</td>
+	    		<td>2.1</td>
+	    		<td>3</td>
+	    		<td>波特兰开拓者队</td>
+	    		<td id="role">PF/C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">291</td>
+	    		<td>萨姆-德克尔</td>
+	    		<td>2.0</td>
+	    		<td>5</td>
+	    		<td>休斯顿火箭队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">292</td>
+	    		<td>杰夫-维希</td>
+	    		<td>1.9</td>
+	    		<td>5</td>
+	    		<td>犹他爵士队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">293</td>
+	    		<td>布林-福布斯</td>
+	    		<td>1.8</td>
+	    		<td>8</td>
+	    		<td>圣安东尼奥马刺队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">294</td>
+	    		<td>弗雷德-范弗里特</td>
+	    		<td>1.7</td>
+	    		<td>5</td>
+	    		<td>多伦多猛龙队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">295</td>
+	    		<td>托马斯-萨托兰斯基</td>
+	    		<td>1.5</td>
+	    		<td>4</td>
+	    		<td>华盛顿奇才队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">296</td>
+	    		<td>泰勒-恩尼斯</td>
+	    		<td>0.4</td>
+	    		<td>0</td>
+	    		<td>洛杉矶湖人队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">297</td>
+	    		<td>斯宾塞-霍伊斯</td>
+	    		<td>0.3</td>
+	    		<td>3</td>
+	    		<td>密尔沃基雄鹿队</td>
+	    		<td id="role">C</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">298</td>
+	    		<td>杰拉米-格兰特</td>
+	    		<td>0.2</td>
+	    		<td>1</td>
+	    		<td>俄克拉荷马雷霆队</td>
+	    		<td id="role">SF/PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">299</td>
+	    		<td>杰弗瑞-洛文吉</td>
+	    		<td>-0.5</td>
+	    		<td>-1</td>
+	    		<td>芝加哥公牛队</td>
+	    		<td id="role">PF</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">300</td>
+	    		<td>沙松-兰德尔</td>
+	    		<td>-1.0</td>
+	    		<td>-1</td>
+	    		<td>纽约尼克斯队</td>
+	    		<td id="role">PG</td>
+	    	</tr>
+	    	
+	    	<tr>
+	    		<td id="rank">301</td>
+	    		<td>托尼-道格拉斯</td>
+	    		<td>-2.6</td>
+	    		<td>-6</td>
+	    		<td>孟菲斯灰熊队</td>
+	    		<td id="role">PG/SG</td>
+	    	</tr>
+	    	
+	    </table>
+				
+		
+		
+	<br>
+	<footer class="footer">
+      <div class="container">
+        <p class="text-muted" id="footertext">
+        	Copyright © 2017 WWW.SUNSIQUAN.TOP All Rights Reserved 闽ICP备17002859号
+        </p>
+      </div>
+    </footer>
+    <script src="../static/js/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../static/js/bootstrap.min.js"></script>
+</body>
+
+</html>
