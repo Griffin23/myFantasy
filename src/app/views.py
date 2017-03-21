@@ -4,7 +4,8 @@ from app import app,db
 from models import player_detail, player_cost, player_fantasypoint
 from sqlalchemy.sql.expression import distinct
 from sqlalchemy import desc, between
-from app.util import timeutil, randomcode
+from app.util import timeutil
+from app.util import randomcodeUtil
 from app.util.entity import player_point_cost, player_point_time, player_rank
 from sqlalchemy.sql.functions import func
 import StringIO
@@ -75,7 +76,7 @@ def sendmail():
 
 @app.route('/getrandomcode<regex("[0-9]*"):salt>')
 def getrandomcode(salt):
-    createImg_result = randomcode.create_validate_code()
+    createImg_result = randomcodeUtil.create_validate_code()
     code_img = createImg_result[0]
     session['randomCode'] = createImg_result[1]
     buf = StringIO.StringIO()

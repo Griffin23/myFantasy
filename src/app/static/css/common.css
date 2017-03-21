@@ -1,0 +1,24 @@
+.navbar {
+	background: black;
+}
+.active {
+	background-color: white;
+}
+#unchosed {
+	color: grey;
+}
+#time {
+	color: white;
+}
+#chosed {
+	color: white;
+}
+table {
+	background: #cccccc;
+}
+.footer {
+	background: black;
+}
+#footertext {
+	color: white;
+}

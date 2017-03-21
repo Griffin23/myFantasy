@@ -18,24 +18,24 @@
 	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" style="width:70%;margin:0px auto;">
 	      <ul class="nav navbar-nav">
 	      	{% if flag == "point_rank" %}
-	        <li class="active"><a href="{{ url_for('index') }}">评分排名</a></li>
+	        <li><a id="chosed" href="{{ url_for('index') }}">评分排名</a></li>
 	        {% else %}
-	        <li class=""><a href="{{ url_for('index') }}">评分排名</a></li>
+	        <li class=""><a id="unchosed" class="unchosedfont" href="{{ url_for('index') }}">评分排名</a></li>
 	        {% endif %}
 	        {% if flag == "point_cost" %}
-	        <li class="active"><a href="{{ url_for('point_cost') }}">性价排名</a></li>
+	        <li><a id="chosed" href="{{ url_for('point_cost') }}">性价排名</a></li>
 	        {% else %}
-	        <li class=""><a href="{{ url_for('point_cost') }}">性价排名</a></li>
+	        <li class=""><a id="unchosed" class="unchosedfont" href="{{ url_for('point_cost') }}">性价排名</a></li>
 	        {% endif %}
 	        {% if flag == "point_time" %}
-	        <li class="active"><a href="{{ url_for('point_time') }}">效率排名</a></li>
+	        <li><a id="chosed" href="{{ url_for('point_time') }}">效率排名</a></li>
 	        {% else %}
-	        <li class=""><a href="{{ url_for('point_time') }}">效率排名</a></li>
+	        <li class=""><a id="unchosed" class="unchosedfont" href="{{ url_for('point_time') }}">效率排名</a></li>
 	        {% endif %}
 	        {% if flag == "suggest" %}
-	        <li class="active"><a href="{{ url_for('suggest') }}">留言建议</a></li>
+	        <li><a id="chosed" href="{{ url_for('suggest') }}">留言建议</a></li>
 	        {% else %}
-	        <li class=""><a href="{{ url_for('suggest') }}">留言建议</a></li>
+	        <li class=""><a id="unchosed" class="unchosedfont" href="{{ url_for('suggest') }}">留言建议</a></li>
 	        {% endif %}
 	      </ul>
 	      <p class="navbar-text navbar-right" id="time"></p>
@@ -58,7 +58,7 @@
 	注：最近两周球员范特西评分的总值与总上场时间的比。效率 = 最近两周范特西评分总值 / 总上场时间。
 	</div>
 	{% endif %}
-	
+
 	<br>
 	
 		{% if flag == "point_rank" %}  
@@ -166,12 +166,13 @@
 	    </table>
 		{% endif %}
 		{% if flag == "suggest" %} 
-		<br> <br> <br> <br> 
+		<br>
     	{% if randomCode=="0" %}
-		<div class="alert alert-danger" role="alert" style="font-size:12px;width:50%;margin:0px auto;">提示：您输入的验证码有误，请重新输入！</div><br> 
-		{% endif %}
-    	{% if randomCode=="1" %}
+		<div class="alert alert-danger" role="alert" style="font-size:12px;width:50%;margin:0px auto;">提示：您输入的验证码有误，请重新输入！</div><br>
+    	{% elif randomCode=="1" %}
 		<div class="alert alert-success" role="alert" style="width:50%;margin:0px auto;">提示：邮件已发送，感谢您的建议！</div><br> 
+		{% else %}
+		<div class="alert alert-success" role="alert" style="width:50%;margin:0px auto;visibility:hidden;"></div><br> 	
 		{% endif %}
 		<form action="{{ url_for('sendmail') }}" method="post">
   			<div class="form-group">
@@ -191,7 +192,7 @@
 	<br>
 	<footer class="footer">
       <div class="container">
-        <p class="text-muted">
+        <p class="text-muted" id="footertext">
         	Copyright © 2017 WWW.SUNSIQUAN.TOP All Rights Reserved 闽ICP备17002859号
         </p>
       </div>

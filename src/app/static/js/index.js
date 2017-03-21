@@ -3,8 +3,8 @@ $(function(){
 	$("td").css("width", "10%");
 	$("table").css("width", "67%").css("margin", "0px auto").css("font-size", "12px");
 	$("form").css("width", "50%").css("margin", "0px auto").css("font-size", "12px");
-	$("footer").css("background", "linear-gradient(#0bc, #fff)");
-	$("nav").css("background", "linear-gradient(#6cc, #ccc)");
+	//$("footer").css("background", "linear-gradient(#0bc, #fff)");
+	//$("nav").css("background", "linear-gradient(#6cc, #ccc)");
 	$(".roleselector").click(function(){
 		var count = 0;
 		//首先显示所有的记录
