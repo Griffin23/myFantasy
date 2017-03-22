@@ -1,7 +1,7 @@
 $(function(){
 	$("#time").text(currentTime()).css("margin-right", "1px");
-	$("td").css("width", "10%");
-	$("table").css("width", "67%").css("margin", "0px auto").css("font-size", "12px");
+	//$("td").css("width", "10%");
+	//$("table").css("width", "67%").css("margin", "0px auto").css("font-size", "12px");
 	$("form").css("width", "50%").css("margin", "0px auto").css("font-size", "12px");
 	//$("footer").css("background", "linear-gradient(#0bc, #fff)");
 	//$("nav").css("background", "linear-gradient(#6cc, #ccc)");

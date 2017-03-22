@@ -13,8 +13,14 @@
 #chosed {
 	color: white;
 }
-table {
+#table {
 	background: #eeeeee;
+	width: 67%;
+	margin: 0px auto;
+	font-size: 12px;
+}
+#table td{
+	width: 10%;
 }
 .footer {
 	background: black;
